@@ -20,15 +20,19 @@ function initRTKclient(confNet, cb, io) {
     // Listening RTKlib
     client.on('data', handleData);
 
+    // If connections ends... reconnects
     client.on('end', () => {
+      const data = { message: 'Disconnected from receiver...' };
       debug('Disconnected from server');
+      io.emit('disconnected_rtkrcv', data);
+      setTimeout(cb, 2000, confNet, cb, io);
     });
   });
 
   // If an error occurs... reconnects
   client.on('error', err => {
     if (err) {
-      let data = { message: 'No receiving data...' };
+      const data = { message: 'No receiving data from receiver...' };
       io.emit('connection_error_rtkrcv', data);
       debug(chalk.red(`An error ocurred trying to connect...`));
       setTimeout(cb, 2000, confNet, cb, io);
