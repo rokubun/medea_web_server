@@ -1,0 +1,13 @@
+.DS_Store
+node_modules
+
+# Not needed to be versioned
+package-lock.json
+
+# Ignore envars
+.env
+
+# RTKLIB Configuration files
+RTKLIB/configs/*
+
+.vs
