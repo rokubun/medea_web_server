@@ -21,7 +21,7 @@ const getClientIp = (req) => {
 
 
 const handleData = data => {
-  const {gps} = require('../index.js');
+  const {gps} = require('../events');
   data = data.toString().split('\r\n');
   data.forEach(function (line) {
     if (line.indexOf('GGA') !== -1) {
