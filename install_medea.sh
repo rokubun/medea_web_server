@@ -5,12 +5,11 @@ if [ "$EUID" -ne 0 ]
   exit
 fi
 
-$PATHNAME = "medea"
-$MEDEA_PATH = ~/$PATHNAME
-
-# Clone MEDEA web server into home
-cd ~
-git clone https://github.com/rokubun/medea_web_server.git $PATHNAME
+# Install Linux packages
+apt-key add /var/lib/apt/keyrings/artik-platform-keyring.gpg
+apt-get update
+apt-get upgrade
+apt-get install git gitk ofono ofono-scripts nano
 
 # Install NodeJS 10.x
 apt-get install python-software-properties
@@ -18,10 +17,8 @@ curl -sL https://deb.nodesource.com/setup_10.x | sudo -E bash -
 apt-get install -y nodejs
 
 # Install node packets
-cd $MEDEA_PATH/frontend
-npm install http-server
-
-cd $MEDEA_PATH/api
+npm install http-server -g
+cd api
 npm install
 
 
