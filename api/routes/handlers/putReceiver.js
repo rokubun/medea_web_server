@@ -1,14 +1,30 @@
 const chalk = require('chalk');
 const debug = require('debug')('RtkReceiver');
 
-const putReceiver = (req, res) => {
-  // req.io.emit('status-changed', { status: 'ON' });
+const { openRTK, sendCommand, checkRTKstatus } = require('../../RTKLIB/controller');
+const { rtklib } = require('../../RTKLIB/state');
+const { checkState } = rtklib;
+
+const putReceiver = async (req, res) => {
   const { state } = req.body.data;
-  debug(chalk.yellow(`Trying to turn receiver`,
-  state ? `${chalk.green('ON')}` : `${chalk.red('OFF')}`));
-  // TODO : Call some script to check if it's running or use nodejs instead
-  // res.status(202).json({ message: 'Status successfully changed' });
-  res.status(409).json({ message: 'Error changing rtkrcv' });
+  const { server, io } = req.body;
+  
+  if (state && !checkState('isRunning')) {
+    if (!checkState('isOpen')) {
+      await openRTK();
+    }
+    await sendCommand('start', server);
+    debug(chalk.yellow(`Trying to turn receiver`,
+    state ? `${chalk.green('ON')}` : `${chalk.red('OFF')}`));
+  } else {
+    if (checkState('isOpen')) {
+      sendCommand('stop', server);
+      debug(chalk.yellow(`Trying to turn receiver`,
+      state ? `${chalk.green('ON')}` : `${chalk.red('OFF')}`));
+      // TODO : Kill process and change isOpen to false
+    }
+  }
+  res.status(202).json({ message: 'State request successfully' , state: checkState('isRunning')});
 }
 
 module.exports = putReceiver;

@@ -1,15 +1,11 @@
 'use strict';
 
-let RTK = {
-  status: 'OFF'
-};
-
 require('dotenv').config();
 
 // Terminal Colors
 const chalk = require('chalk');
-
-const bodyParser = require('body-parser')
+const telnet = require('telnet-client');
+const bodyParser = require('body-parser');
 
 // Load express framework
 const express = require('express');
@@ -28,9 +24,10 @@ const { PORT, confNet } = require('./config');
 const configureHeaders = require('./middlewares/headers');
 
 
-const { initRTKclient, initSocketServer } = require('./events');
+const { initTCPclient, initSocketServer } = require('./events');
 const router = require('./routes/routes');
-//const watchRTKserver = require('./RTKLIB/watcher');
+const { openRTK, connectTelnet, initWatcher } = require('./RTKLIB/controller');
+
 
 // Parsing body requests
 app.use(bodyParser.urlencoded({ extended: false }))
@@ -42,18 +39,30 @@ app.use(configureHeaders);
 // Create a socket instance
 const io = require('socket.io')(http);
 
-// Initialize RTK Socket Client to receive data from rtkrcv
-initRTKclient(confNet, initRTKclient, io);
+// Create telnet client
+const server = new telnet();
 
+server.connect({
+  host: 'localhost',
+  port: confNet.telnetPort,
+});
+
+// Initialize RTK Socket Client to receive data from rtkrcv
+initTCPclient(confNet, initTCPclient, io);
 
 // Initialize our Socket Server that will be used by front
 initSocketServer(io);
 
-// Watch if the rtkrcv is running and changes the state
-//watchRTKserver(io);
+// Open rtklib process
+openRTK(null, io);
+connectTelnet(server, io);
+initWatcher(server, initWatcher);
+
+
+app.use((req, res, next) => { req.body.server = server; next(); });
 
 // Inject SocketIo to req
-app.use((req, res, next) => { req = { io }; next(); });
+app.use((req, res, next) => { req.body.io = io; next(); });
 
 app.use(router);
 

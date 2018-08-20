@@ -8,10 +8,11 @@ const whitelist = require('validator/lib/whitelist');
 const chalk = require('chalk');
 const debug = require('debug')('Sockets');
 
+const { rtklib } = require('../RTKLIB/state');
+
 const gps = new GPS;
 
-function initRTKclient(confNet, cb, io) {
-
+const initTCPclient = (confNet, cb, io) => {
   const client = net.createConnection(confNet, () => {
     debug(`Connected to RTKrcv, using ${confNet.host}:${confNet.port}`);
     // Listening RTKlib
@@ -32,7 +33,7 @@ function initRTKclient(confNet, cb, io) {
       const data = { message: 'No receiving data from receiver...' };
       io.emit('connection_error_rtkrcv', data);
       
-      debug(chalk.red(`An error ocurred trying to connect...`));
+      debug(chalk.red(`Timeout trying to connect...`));
       setTimeout(cb, 10000, confNet, cb, io);
     }
   });
@@ -41,19 +42,21 @@ function initRTKclient(confNet, cb, io) {
 }
 
 
-function initSocketServer(io) {
-  // To front-end
+const initSocketServer = (io) => {
   const returnIo = io.on('connection', function (client) {
     const ip = whitelist(client.handshake.address, '\\[0-9\.\\]');
 
     debug(chalk.yellow.bgBlue.bold(ip), chalk.green.bgBlue.bold('Connected via sockets'));
-    
     io.sockets.emit('client-connected');
+    
+    debug(chalk.bgWhite.green.bold(
+      `Sending rtkrcv state to client ${chalk.cyan(rtklib.checkState('isRunning'))}`),
+      chalk.yellow.bgBlue.bold(ip)
+    );
+    io.sockets.emit('rtkrcv_status', { state: rtklib.checkState('isRunning') });
   
-    // client.on('leave', handleLeave)
     client.on('disconnect', function () {
-      console.log('client disconnect...', client.id);
-      // handleDisconnect()
+      console.log('client disconnected...', client.id);
     })
   
     client.on('error', function (err) {
@@ -61,33 +64,21 @@ function initSocketServer(io) {
       console.log(err);
     })
   })
-
-  gps.on('GSV', function (data) {
-    debug(`GPGSV to client ${data.raw}`);
-    if (data.prn !== null)
-    io.emit('gsv_event', data);
-  });
-  
-  gps.on('GGA', function (data) {
-    debug(`Emitting to client ${data.raw}`);
-    io.emit('position', data);
+    
+  gps.on('GGA', (data) => {
+    gps.state.quality = data.quality;
+    gps.state.geoidal = data.geoidal;
+    gps.state.alt = data.alt;
   });
 
-  gps.on('RMC', function (data) {
-    debug(`Emitting to client ${data.raw}`);
-    io.emit('rmc_event', data);
+  gps.on('data', (data) => {
+    
   });
-
-  gps.on('GSA', function (data) {
-    debug(`Emitting to client ${data.raw}`);
-    io.emit('gsa_event', data);
-  });
-  
-  gps.on('data', function (data) {
-    io.emit('gps_state', gps.state);
-  });
+  // setInterval(() => {
+  //   socket.emmit(gps.state)
+  // }, 10000)
 
   return returnIo;
 }
 
-module.exports = { initRTKclient, initSocketServer, gps }
+module.exports = { initTCPclient, initSocketServer, gps }
