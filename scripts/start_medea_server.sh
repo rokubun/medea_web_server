@@ -1,10 +1,10 @@
 #!/bin/bash
-MEDEA_WEB_SERVER="/home/artik/medea"
+MEDEA_WEB_SERVER="/home/medea/medea_web_server"
 
 # Update deploy 
 cd $MEDEA_WEB_SERVER
 git pull
-# cd /home/artik/
+# cd /home/medea/
 
 # Setup Wifi as an access point
 # ./start_ap.sh
