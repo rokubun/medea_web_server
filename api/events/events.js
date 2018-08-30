@@ -1,7 +1,7 @@
 const net = require('net');
 const GPS = require('gps');
 
-const { handleData } = require('../logic');
+const { parseData } = require('../logic');
 
 const whitelist = require('validator/lib/whitelist');
 
@@ -12,11 +12,48 @@ const { rtklib } = require('../RTKLIB/state');
 
 const gps = new GPS;
 
+let gsv = {
+  GPS: {satellites: []},
+  GLONASS: {satellites: []},
+}
+
 const initTCPclient = (confNet, cb, io) => {
+  const updateGSV = (sentence, type) => {
+    const aSentence = sentence.split(',');
+    const updated = GPS.Parse(sentence)
+    gsv[type].satellites = [...gsv[type].satellites, ...updated.satellites];
+    if (aSentence[1] === aSentence[2]) {
+      io.sockets.emit('GSV_' + type, gsv[type]);
+      gsv[type].satellites = [];
+    }
+  }
+  
   const client = net.createConnection(confNet, () => {
     debug(`Connected to RTKrcv, using ${confNet.host}:${confNet.port}`);
     // Listening RTKlib
-    client.on('data', handleData);
+    client.on('data', (data) => {
+      const medeaSentences = parseData(data);
+      medeaSentences.forEach((sentence, i) => {
+        try {
+          gps.update(sentence);
+        } catch (err) {
+          debug(chalk.yellow('GPS.js'), chalk.red(err));
+        }
+        if (sentence.indexOf('GGA') !== -1) {
+          io.sockets.emit('GGA', GPS.Parse(sentence));
+        } else if (sentence.indexOf('GLGSA') !== -1) {
+          io.sockets.emit('GLGSA', GPS.Parse(sentence));
+        } else if (sentence.indexOf('GPGSA') !== -1) {
+          io.sockets.emit('GPGSA', GPS.Parse(sentence));
+        }else if (sentence.indexOf('GLGSV') !== -1) {
+          updateGSV(sentence, 'GLONASS');
+        } else if (sentence.indexOf('GPGSV') !== -1) {
+          updateGSV(sentence, 'GPS');
+        } else if (sentence.indexOf('RMC') !== -1) {
+          io.sockets.emit('RMC', GPS.Parse(sentence));
+        }
+      });
+    });
 
     // If connections ends... reconnects
     client.on('end', () => {
@@ -26,7 +63,7 @@ const initTCPclient = (confNet, cb, io) => {
       setTimeout(cb, 2000, confNet, cb, io);
     });
   });
-
+    
   // If an error occurs... reconnects
   client.on('error', err => {
     if (err) {
@@ -71,12 +108,6 @@ const initSocketServer = (io) => {
     gps.state.alt = data.alt;
   });
 
-  gps.on('data', (data) => {
-    
-  });
-  // setInterval(() => {
-  //   socket.emmit(gps.state)
-  // }, 10000)
 
   return returnIo;
 }

@@ -26,11 +26,11 @@ const getClientIp = (req) => {
 
 
 /**
- * handleData
+ * parseData
  * * Parses the nmea data sent via tcp
  * @param {buffer} 'data'
  */
-const handleData = (data) => {
+const parseData = (data) => {
   const { gps } = require('../events');
   let nmeaSentences = data.toString().split('\r\n');
 
@@ -53,16 +53,10 @@ const handleData = (data) => {
 
   if (nmeaFiltered.length !== nmeaSanitized.length) {
     // TODO : Register log files when sentences are wrong
-    debug(chalk.red(`Issues parsing nmea sentences! (from handleData)`));
+    debug(chalk.red(`Issues parsing nmea sentences! (from parseData)`));
   }
 
-  nmeaFiltered.forEach((sentence) => {
-    try {
-      gps.update(sentence);
-    } catch (err) {
-      debug(chalk.yellow('GPS.js'), chalk.red(err));
-    }
-  });
+  return nmeaFiltered;
 }
 
 /**
@@ -195,4 +189,4 @@ const nmeaSanitizer = (line) => {
   return line;
 }
 
-module.exports = { getClientIp, handleData };
+module.exports = { getClientIp, parseData };
