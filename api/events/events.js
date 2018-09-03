@@ -18,37 +18,48 @@ let gsv = {
 }
 
 const initTCPclient = (confNet, cb, io) => {
-  const updateGSV = (sentence, type) => {
+  const updateGSV = (sentenceParsed, sentence, type) => {
     const aSentence = sentence.split(',');
-    const updated = GPS.Parse(sentence)
-    gsv[type].satellites = [...gsv[type].satellites, ...updated.satellites];
+    gsv[type].satellites = [...gsv[type].satellites, ...sentenceParsed.satellites];
     if (aSentence[1] === aSentence[2]) {
       io.sockets.emit('GSV_' + type, gsv[type]);
       gsv[type].satellites = [];
     }
   }
-  
+
+  // Empties nmea sentences sent by rtkrcv
+  const emptiesSentences = ['$GPGSA,A,1,,,,,,,,,,,,,,,*1E', '$GPGSV,1,1,0,,,,,,,,,,,,*49']
+
   const client = net.createConnection(confNet, () => {
     debug(`Connected to RTKrcv, using ${confNet.host}:${confNet.port}`);
     // Listening RTKlib
     client.on('data', (data) => {
-      const medeaSentences = parseData(data);
-      medeaSentences.forEach((sentence, i) => {
-        try {
-          gps.update(sentence);
-        } catch (err) {
-          debug(chalk.yellow('GPS.js'), chalk.red(err));
+      const nmeaSentences = parseData(data);
+      nmeaSentences.forEach((sentence, i) => {
+        const sentenceParsed = GPS.Parse(sentence);
+        if (sentence === emptiesSentences[0] || sentence === emptiesSentences[1]) {
+          const count = rtklib.checkCount();
+          if (count >= 2) {
+            io.sockets.emit('empty_gnss_data', true);
+            debug('No receiving gnss data');
+          }
+          rtklib.sumCount();
+        } else {
+          rtklib.resetCount();
+          io.sockets.emit('empty_gnss_data', false);
+          io.emit('tcp_error', false);
         }
+
         if (sentence.indexOf('GGA') !== -1) {
-          io.sockets.emit('GGA', GPS.Parse(sentence));
+          io.sockets.emit('GGA', sentenceParsed);
         } else if (sentence.indexOf('GLGSA') !== -1) {
-          io.sockets.emit('GLGSA', GPS.Parse(sentence));
+          io.sockets.emit('GLGSA', sentenceParsed);
         } else if (sentence.indexOf('GPGSA') !== -1) {
-          io.sockets.emit('GPGSA', GPS.Parse(sentence));
-        }else if (sentence.indexOf('GLGSV') !== -1) {
-          updateGSV(sentence, 'GLONASS');
+          io.sockets.emit('GPGSA', sentenceParsed);
+        } else if (sentence.indexOf('GLGSV') !== -1) {
+          updateGSV(sentenceParsed, sentence, 'GLONASS');
         } else if (sentence.indexOf('GPGSV') !== -1) {
-          updateGSV(sentence, 'GPS');
+          updateGSV(sentenceParsed, sentence, 'GPS');
         } else if (sentence.indexOf('RMC') !== -1) {
           io.sockets.emit('RMC', GPS.Parse(sentence));
         }
@@ -66,11 +77,12 @@ const initTCPclient = (confNet, cb, io) => {
     
   // If an error occurs... reconnects
   client.on('error', err => {
-    if (err) {
-      const data = { message: 'No receiving data from receiver...' };
-      io.emit('connection_error_rtkrcv', data);
-      
-      debug(chalk.red(`Timeout trying to connect...`));
+    if (err) {   
+      // It's open and tcp can't connect... send to clients
+      if (rtklib.checkState('isOpen')) {
+        io.emit('tcp_error', true);
+        debug(chalk.red('Timeout trying to connect...'));
+      }
       setTimeout(cb, 10000, confNet, cb, io);
     }
   });
@@ -86,7 +98,7 @@ const initSocketServer = (io) => {
     debug(chalk.yellow.bgBlue.bold(ip), chalk.green.bgBlue.bold('Connected via sockets'));
     io.sockets.emit('client-connected');
     
-    debug(chalk.bgWhite.green.bold(
+    debug(chalk.green.bold(
       `Sending rtkrcv state to client ${chalk.cyan(rtklib.checkState('isRunning'))}`),
       chalk.yellow.bgBlue.bold(ip)
     );

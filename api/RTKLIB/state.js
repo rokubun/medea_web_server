@@ -5,6 +5,21 @@ const rtklib = {
   isOpen: false,
   isRunning: false,
   pid: 0,
+  countEmpties: 0,
+  sumCount: () => {
+    if (typeof(this.countEmpties) === 'number') {
+      this.countEmpties += 1;
+    } else {
+      this.countEmpties = 0;
+    }
+  },
+  resetCount: () => {
+    this.countEmpties = 0;
+  },
+  checkCount: () => {
+    const count = this.countEmpties;
+    return count;
+  },
   updateState: (type, state, io) => {
     if (this[type] !== state) {
       this[type] = state;

@@ -2,21 +2,27 @@
 
 const spawn = require('child_process').spawn;
 const debug = require('debug')('RtkReceiver');
+var path = require('path');
 
 const { rtklib } = require('./state');
 const isRunning = require('is-running');
 
 const { confNet } = require('../config');
-// Launch RTKrcv using configs
+
+/**
+ * Launch a rtkrcv instance as a child
+ * @param {string} 'configFile'
+ * @return {object} 'io'
+ */
 const openRTK = (configFile, io) => {
   let configPath;
   
-  const rtkPath = '/home/artik/rtklib/app/rtkrcv/gcc';
+  const rtkPath = path.join(__dirname, '..', '..', 'rtklib');
 
   if (!configFile) {
-    configPath = `${__dirname}/configs/default.conf`;
+    configPath = path.join(__dirname, '..', '..', 'rtklib', 'confs', 'rok-rtk.conf');
   } else {
-    configPath = `${__dirname}/${configFile}`;
+    configPath = path.join(__dirname, '..', '..', 'rtklib', 'confs', configFile);
   }
   
   // Starts rtkrcv and update the state
@@ -26,7 +32,9 @@ const openRTK = (configFile, io) => {
   rtklib.updateState('pid', rtkrcv.pid);
   
   rtkrcv.on('error', (err) => {
-    debug(`Error ${err.toString()}`);
+    debug(`${err.toString()}`);
+    rtklib.updateState('isOpen', false, io);
+    // TODO : Show an error in frontend
   });
 
   rtkrcv.on('exit', (code) => {
