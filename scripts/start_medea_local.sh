@@ -27,27 +27,13 @@ start_frontend () {
 
 
 # Update deploy (commented since the uplink might not be available)
-# cd $MEDEA_WEB_SERVER
-# git pull
-# cd /home/medea/
-
-# Setup Wifi as an access point
-# connmanctl tether wifi on MEDEA rocboronat
-
-# Setup cellular (this might be a redundant step)
-# connmanctl enable cellular
-
-# The corresponding cellular service shall have been configured to autoconnect
-# $MEDEA_WEB_SERVER/scripts/start_sara.sh
-# Test connectivity until success or timeout after 60 seconds
-# echo -ne "Monitoring cellular connection..."
-# while true; do
-#   $MEDEA_WEB_SERVER/scripts/test_connection.sh
-#   if [ $? -eq 2 ]; then
-#     $MEDEA_WEB_SERVER/scripts/start_sara.sh
-#     sleep 5
-#   fi
-# done
+$MEDEA_WEB_SERVER/scripts/test_connection.sh
+if [ $? -eq 0 ]; then
+  cd $MEDEA_WEB_SERVER
+  git pull
+  cd $MEDEA_WEB_SERVER/api
+  npm install
+fi
 
 # Monitor API and Frontend processes and restart them forever
 start_api

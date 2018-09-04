@@ -25,9 +25,13 @@ start_frontend () {
 
 
 # Update deploy (commented since the uplink might not be available)
-# cd $MEDEA_WEB_SERVER
-# git pull
-# cd /home/medea/
+$MEDEA_WEB_SERVER/scripts/test_connection.sh
+if [ $? -eq 0 ]; then
+  cd $MEDEA_WEB_SERVER
+  git pull
+  cd $MEDEA_WEB_SERVER/api
+  npm install
+fi
 
 # Setup Wifi as an access point
 connmanctl tether wifi on MEDEA rocboronat
