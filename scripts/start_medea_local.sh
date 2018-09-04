@@ -7,6 +7,8 @@ MEDEA_WEB_SERVER=/home/medea/medea_web_server
 # It will work as long as the last component of the path used to find the script is not a symlink 
 # (directory links are OK)
 
+export DEBUG="Medea,Sockets,UploadFile,RtkReceiver,rtkStatus"
+
 # Start API process function
 start_api () {
   cd $MEDEA_WEB_SERVER/api
@@ -30,13 +32,13 @@ start_frontend () {
 # cd /home/medea/
 
 # Setup Wifi as an access point
-connmanctl tether wifi on MEDEA rocboronat
+# connmanctl tether wifi on MEDEA rocboronat
 
 # Setup cellular (this might be a redundant step)
-connmanctl enable cellular
+# connmanctl enable cellular
 
 # The corresponding cellular service shall have been configured to autoconnect
-$MEDEA_WEB_SERVER/scripts/start_sara.sh
+# $MEDEA_WEB_SERVER/scripts/start_sara.sh
 # Test connectivity until success or timeout after 60 seconds
 # echo -ne "Monitoring cellular connection..."
 # while true; do
