@@ -36,27 +36,15 @@ app.use(bodyParser.json())
 // Middlewares before start routes
 app.use(configureHeaders);
 
-// Create a socket instance
+// Create the instances
 const io = require('socket.io')(http);
-
-// Create telnet client
 const server = new telnet();
-
-server.connect({
-  host: 'localhost',
-  port: confNet.telnetPort,
-});
 
 // Initialize RTK Socket Client to receive data from rtkrcv
 initTCPclient(confNet, initTCPclient, io);
 
 // Initialize our Socket Server that will be used by front
 initSocketServer(io);
-
-// Open rtklib process
-openRTK(null, io);
-connectTelnet(server, io);
-initWatcher(server, initWatcher);
 
 
 app.use((req, res, next) => { req.body.server = server; next(); });

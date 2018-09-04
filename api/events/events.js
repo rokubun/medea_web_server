@@ -38,6 +38,7 @@ const initTCPclient = (confNet, cb, io) => {
       nmeaSentences.forEach((sentence, i) => {
         const sentenceParsed = GPS.Parse(sentence);
         if (sentence === emptiesSentences[0] || sentence === emptiesSentences[1]) {
+          debug(sentence);
           const count = rtklib.checkCount();
           if (count >= 2) {
             io.sockets.emit('empty_gnss_data', true);

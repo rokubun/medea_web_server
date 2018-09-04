@@ -4,10 +4,23 @@ const spawn = require('child_process').spawn;
 const debug = require('debug')('RtkReceiver');
 var path = require('path');
 
+const telnet = require('telnet-client');
 const { rtklib } = require('./state');
 const isRunning = require('is-running');
 
 const { confNet } = require('../config');
+
+const sendCommand = (command, server) => {
+  server.send(command + '\r\n');
+}
+
+const initWatcher = (server, cb) => {
+  if (rtklib.checkState('isOpen')) {
+    sendCommand('status', server);
+    setTimeout(cb, 1000, server, cb);
+  }
+}
+
 
 /**
  * Launch a rtkrcv instance as a child
@@ -58,22 +71,33 @@ const checkRTKstatus = () => {
 /* 
 * Connects to rtkrcv terminal
 */
-const connectTelnet = (server, io) => {
+const connectTelnet = (server, io, cb) => {
+
   server.on('connect', () => {
+    debug('connected to telnet');
     server.send('rtkpsswd32\r\n');
+    server.send('start\r\n');
+    initWatcher(server, initWatcher);
   });
 
-  server.on('error', (error) => {
-    console.log(error);
-  })
+  server.on('timeout', function() {
+    debug('telnet timeout...');
+    server.end();
+  });
 
+
+  server.on('error', (error) => {
+    debug(error);
+  });
+
+  debug('trying to connect via telnet');
   server.on('close', () => {
     debug(`Telnet connection closed`);
     // TODO : Check if rtklib is running, if it's running, try to close and re-open rtkrcv
-    setTimeout((server) => {
+    if (rtklib.checkState('isOpen')) {
       debug(`Trying to connect to telnet ${server}`);
-      connectTelnet(server);
-    }, 2000, server, connectTelnet);
+      setTimeout(cb, 5000, server, io, cb);
+    }
   });
 
   let line = '';
@@ -100,16 +124,16 @@ const connectTelnet = (server, io) => {
         }
     }
   });
+
+  server.connect({
+    host: 'localhost',
+    port: confNet.telnetPort,
+    timeout: 5000,
+  });
 }
 
-const sendCommand = (command, server) => {
-  server.send(command + '\r\n');
-}
 
-const initWatcher = (server, cb) => {
-  setTimeout(cb, 1000, server, cb);
-  sendCommand('status', server);
-}
+
 
 module.exports = {
   openRTK,
