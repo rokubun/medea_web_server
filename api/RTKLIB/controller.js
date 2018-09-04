@@ -15,18 +15,18 @@ const { confNet } = require('../config');
  * @return {object} 'io'
  */
 const openRTK = (configFile, io) => {
-  let configPath;
-  
-  const rtkPath = path.join(__dirname, '..', '..', 'rtklib');
-
   if (!configFile) {
-    configPath = path.join(__dirname, '..', '..', 'rtklib', 'confs', 'rok-rtk.conf');
-  } else {
-    configPath = path.join(__dirname, '..', '..', 'rtklib', 'confs', configFile);
+    configFile = 'rok-rtk.conf';
   }
   
+  const rtkPath = path.join(__dirname, '..', '..', 'rtklib') + '/rtkrcv';
+  const configPath = path.join(__dirname, '..', '..', 'rtklib', 'confs') + '/' + configFile;
+
+  debug('Using this rtkrcv path : ', rtkPath);
+  debug('Using this config path : ', configPath);
+
   // Starts rtkrcv and update the state
-  const rtkrcv = spawn(rtkPath + '/rtkrcv', ['-o', configPath, '-w', 'rtkpsswd32', '-p', confNet.telnetPort]);
+  const rtkrcv = spawn(rtkPath, ['-o', configPath, '-w', 'rtkpsswd32', '-p', confNet.telnetPort]);
   rtklib.updateState('isOpen', true, io);
   rtklib.updateState('isRunning', false, io);
   rtklib.updateState('pid', rtkrcv.pid);
