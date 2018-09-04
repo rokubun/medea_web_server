@@ -24,13 +24,8 @@ start_frontend () {
   echo "New Front PID: $PID_FRONT"
 }
 
-# Disable Wifi tethering
-connmanctl tether wifi off
 
-# Disable MEDEA service
-systemctl stop medea.service
-
-# Update and deploy (commented since the uplink might not be available)
+# Update deploy (commented since the uplink might not be available)
 $MEDEA_WEB_SERVER/scripts/test_connection.sh
 if [ $? -eq 0 ]; then
   cd $MEDEA_WEB_SERVER
