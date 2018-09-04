@@ -1,30 +1,72 @@
 #!/bin/bash
-MEDEA_WEB_SERVER="/home/medea/medea_web_server"
 
-# Update deploy 
-cd $MEDEA_WEB_SERVER
-git pull
+# Get the absolute path of the MEDEA_WEB_SERVER
+# Folders 'api', 'frontend' and 'scripts' shall respect the relative paths used in this script
+MEDEA_WEB_SERVER="$( cd .. "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null && pwd )"
+# It will work as long as the last component of the path used to find the script is not a symlink 
+# (directory links are OK)
+
+# Start API process function
+start_api () {
+  cd $MEDEA_WEB_SERVER/api
+  node server.js &
+  PID_API=$!
+  echo "New API PID: $PID_API"
+}
+
+# Start Frontend process function
+start_frontend () {
+  cd $MEDEA_WEB_SERVER/frontend
+  http-server . -p 5000 &
+  PID_FRONT=$!
+  echo "New Front PID: $PID_FRONT"
+}
+
+
+# Update deploy (commented since the uplink might not be available)
+# cd $MEDEA_WEB_SERVER
+# git pull
 # cd /home/medea/
 
 # Setup Wifi as an access point
-# ./start_ap.sh
+connmanctl tether wifi on MEDEA rocboronat
 
-# Setup cellular
-#./start_sara.sh
+# Setup cellular (this might be a redundant step)
+connmanctl enable cellular
 
-# Start RTKLIB (backend)
-RTKLIB_PATH=$MEDEA_WEB_SERVER/rtklib
+# The corresponding cellular service shall have been configured to autoconnect
+$MEDEA_WEB_SERVER/scripts/start_sara.sh
+# Test connectivity until success or timeout after 60 seconds
+# echo -ne "Monitoring cellular connection..."
+# while true; do
+#   $MEDEA_WEB_SERVER/scripts/test_connection.sh
+#   if [ $? -eq 2 ]; then
+#     $MEDEA_WEB_SERVER/scripts/start_sara.sh
+#     sleep 5
+#   fi
+# done
 
-# Launch RTKRCV process in foreground
-$RTKLIB_PATH/rtkrcv -s -o $RTKLIB_PATH/rok-rtk.conf &
+# Monitor API and Frontend processes and restart them forever
+start_api
+start_frontend
+while true; do
 
-# Start api
-cd $MEDEA_WEB_SERVER/api
-#npm install      # Delete this line in the production version (should be manually executed upfront)
-npm start &
-
-# Start frontend
-cd $MEDEA_WEB_SERVER/frontend
-#npm install      # Delete this line in the production version
-http-server . -p 5000 &
-#serve -s /build &
+  # Restart API process if dead 
+  if kill -0 "$PID_API" >/dev/null 2>&1 ; then
+      # echo "PID API: $PID_API running"
+      :
+  else
+      echo "PID API: $PID_API terminated"
+      start_api
+  fi
+  
+  # Restart Frontend process if dead 
+  if kill -0 "$PID_FRONT" >/dev/null 2>&1 ; then
+      # echo "PID Front: $PID_FRONT running"
+      :
+  else
+      echo "PID Front: $PID_FRONT terminated"
+      start_frontend
+  fi
+  sleep 3
+done
