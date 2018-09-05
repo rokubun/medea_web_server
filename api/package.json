@@ -5,7 +5,7 @@
   "main": "server.js",
   "scripts": {
     "start": " DEBUG=OFF node server.js",
-    "dev": "DEBUG=Medea,Sockets,UploadFile,RtkReceiver,rtkStatus nodemon server.js"
+    "dev": "DEBUG=RtkController,Medea,Sockets,UploadFile,rtkStatus nodemon server.js"
   },
   "author": "Waken",
   "license": "ISC",

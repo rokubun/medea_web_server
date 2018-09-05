@@ -26,8 +26,7 @@ const configureHeaders = require('./middlewares/headers');
 
 const { initTCPclient, initSocketServer } = require('./events');
 const router = require('./routes/routes');
-const { openRTK, connectTelnet, initWatcher } = require('./RTKLIB/controller');
-
+const { openRTK, connectTelnet, initTelnetInstance, initWatcher } = require('./RTKLIB/controller');
 
 // Parsing body requests
 app.use(bodyParser.urlencoded({ extended: false }))
@@ -39,6 +38,9 @@ app.use(configureHeaders);
 // Create the instances
 const io = require('socket.io')(http);
 const server = new telnet();
+
+// Initialize the telnet instance
+initTelnetInstance(server, io, initTelnetInstance);
 
 // Initialize RTK Socket Client to receive data from rtkrcv
 initTCPclient(confNet, initTCPclient, io);

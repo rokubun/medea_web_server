@@ -1,7 +1,7 @@
 'use strict';
 
 const spawn = require('child_process').spawn;
-const debug = require('debug')('RtkReceiver');
+const debug = require('debug')('RtkController');
 var path = require('path');
 
 const telnet = require('telnet-client');
@@ -71,8 +71,16 @@ const checkRTKstatus = () => {
 /* 
 * Connects to rtkrcv terminal
 */
-const connectTelnet = (server, io, cb) => {
+const connectTelnet = (server) => {
+  server.connect({
+    host: confNet.host,
+    port: confNet.telnetPort,
+    timeout: 2500,
+  });
+}
 
+
+const initTelnetInstance = (server, io) => {
   server.on('connect', () => {
     debug('connected to telnet');
     server.send('rtkpsswd32\r\n');
@@ -80,23 +88,19 @@ const connectTelnet = (server, io, cb) => {
     initWatcher(server, initWatcher);
   });
 
-  server.on('timeout', function() {
+  server.on('timeout', () => {
     debug('telnet timeout...');
-    server.end();
   });
-
 
   server.on('error', (error) => {
     debug(error);
   });
 
-  debug('trying to connect via telnet');
   server.on('close', () => {
-    debug(`Telnet connection closed`);
-    // TODO : Check if rtklib is running, if it's running, try to close and re-open rtkrcv
+    debug('Telnet connection closed');
     if (rtklib.checkState('isOpen')) {
       debug(`Trying to connect to telnet ${server}`);
-      setTimeout(cb, 5000, server, io, cb);
+      setTimeout(connectTelnet, 2500, server);
     }
   });
 
@@ -124,15 +128,7 @@ const connectTelnet = (server, io, cb) => {
         }
     }
   });
-
-  server.connect({
-    host: 'localhost',
-    port: confNet.telnetPort,
-    timeout: 5000,
-  });
 }
-
-
 
 
 module.exports = {
@@ -140,4 +136,5 @@ module.exports = {
   connectTelnet,
   sendCommand,
   initWatcher,
+  initTelnetInstance,
 };
