@@ -18,7 +18,7 @@ start_api () {
 # Start Frontend process function
 start_frontend () {
   cd $MEDEA_WEB_SERVER/frontend
-  http-server . -p 5000 &
+  http-server . -p 80 &
   PID_FRONT=$!
   echo "New Front PID: $PID_FRONT"
 }
