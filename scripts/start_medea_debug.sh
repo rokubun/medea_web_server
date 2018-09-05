@@ -26,6 +26,7 @@ start_frontend () {
 
 # Disable Wifi tethering
 connmanctl tether wifi off
+sleep 3
 
 # Disable MEDEA service
 systemctl stop medea.service
