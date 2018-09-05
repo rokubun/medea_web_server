@@ -11,19 +11,13 @@ const putReceiver = async (req, res) => {
   const { state } = req.body.data;
   const { server, io } = req.body;
   
+  debug(chalk.yellow('Turn rtkrcv', state ? `${chalk.green('ON')}` : `${chalk.red('OFF')}`));
+
   if (state && !checkState('isOpen')) {
     await openRTK(null, io);
-    connectTelnet(server, io, connectTelnet);
-    debug(chalk.yellow(`Trying to turn receiver`,
-    state ? `${chalk.green('ON')}` : `${chalk.red('OFF')}`));
-  } else {
-    if (checkState('isOpen')) {
-      //sendCommand('shutdown', server);
+    setTimeout(() => (connectTelnet(server)), 2000);
+  } else if (checkState('isOpen')) {
       process.kill(rtklib.checkState('pid'));
-      debug(chalk.yellow(`Trying to turn receiver`,
-      state ? `${chalk.green('ON')}` : `${chalk.red('OFF')}`));
-      // TODO : Kill process and change isOpen to false
-    }
   }
   res.status(202).json({ message: 'State request successfully' , state: checkState('isRunning')});
 }

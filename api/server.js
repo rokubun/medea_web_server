@@ -39,15 +39,21 @@ app.use(configureHeaders);
 const io = require('socket.io')(http);
 const server = new telnet();
 
-// Initialize the telnet instance
-initTelnetInstance(server, io, initTelnetInstance);
 
-// Initialize RTK Socket Client to receive data from rtkrcv
-initTCPclient(confNet, initTCPclient, io);
+const startAllServices = async () => {
+  // Initialize the telnet instance
+  await initTelnetInstance(server, io, initTelnetInstance);
+  
+  // Initialize our Socket Server that will be used by front
+  await initSocketServer(io);
+  
+  await openRTK(null, io);
+  await setTimeout(() => (connectTelnet(server)), 2000);
+  // Initialize RTK Socket Client to receive data from rtkrcv
+  await initTCPclient(confNet, initTCPclient, io);
+}
 
-// Initialize our Socket Server that will be used by front
-initSocketServer(io);
-
+startAllServices();
 
 app.use((req, res, next) => { req.body.server = server; next(); });
 
