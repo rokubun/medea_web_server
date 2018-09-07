@@ -15,12 +15,14 @@ const gps = new GPS;
 let gsv = {
   GPS: {satellites: []},
   GLONASS: {satellites: []},
+  GALILEO: {satellites: []},
 }
 
 const initTCPclient = (confNet, cb, io) => {
   const updateGSV = (sentenceParsed, sentence, type) => {
     const aSentence = sentence.split(',');
     gsv[type].satellites = [...gsv[type].satellites, ...sentenceParsed.satellites];
+    // The end of new sentences
     if (aSentence[1] === aSentence[2]) {
       io.sockets.emit('GSV_' + type, gsv[type]);
       gsv[type].satellites = [];
@@ -51,6 +53,7 @@ const initTCPclient = (confNet, cb, io) => {
           io.emit('tcp_error', false);
         }
 
+        
         if (sentence.indexOf('GGA') !== -1) {
           io.sockets.emit('GGA', sentenceParsed);
         } else if (sentence.indexOf('GLGSA') !== -1) {
@@ -61,6 +64,8 @@ const initTCPclient = (confNet, cb, io) => {
           updateGSV(sentenceParsed, sentence, 'GLONASS');
         } else if (sentence.indexOf('GPGSV') !== -1) {
           updateGSV(sentenceParsed, sentence, 'GPS');
+        } else if (sentence.indexOf('GAGSV') !== -1) {
+          updateGSV(sentenceParsed, sentence, 'GALILEO');
         } else if (sentence.indexOf('RMC') !== -1) {
           io.sockets.emit('RMC', GPS.Parse(sentence));
         }
