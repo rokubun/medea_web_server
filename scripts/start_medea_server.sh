@@ -2,8 +2,7 @@
 
 # Get the absolute path of the MEDEA_WEB_SERVER
 # Folders 'api', 'frontend' and 'scripts' shall respect the relative paths used in this script
-MEDEA_WEB_SERVER=/home/medea/medea_web_server
-# MEDEA_WEB_SERVER="$( cd .. "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null && pwd )"
+MEDEA_WEB_SERVER=`dirname $(dirname $(realpath $0))`
 # It will work as long as the last component of the path used to find the script is not a symlink 
 # (directory links are OK)
 
