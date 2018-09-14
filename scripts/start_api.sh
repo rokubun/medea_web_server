@@ -14,15 +14,6 @@ start_api () {
   echo "New API PID: $PID_API"
 }
 
-# Start Frontend process function
-start_frontend () {
-  cd $MEDEA_WEB_SERVER/frontend
-  http-server . -p 80 &
-  PID_FRONT=$!
-  echo "New Front PID: $PID_FRONT"
-}
-
-
 # Setup Wifi as an access point
 connmanctl tether wifi on MEDEA rocboronat
 
@@ -43,7 +34,6 @@ $MEDEA_WEB_SERVER/scripts/start_sara.sh
 
 # Monitor API and Frontend processes and restart them forever
 start_api
-start_frontend
 while true; do
 
   # Restart API process if dead 
@@ -55,13 +45,5 @@ while true; do
       start_api
   fi
   
-  # Restart Frontend process if dead 
-  if kill -0 "$PID_FRONT" >/dev/null 2>&1 ; then
-      # echo "PID Front: $PID_FRONT running"
-      :
-  else
-      echo "PID Front: $PID_FRONT terminated"
-      start_frontend
-  fi
   sleep 3
 done
