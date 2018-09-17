@@ -1,6 +1,3 @@
-const chalk = require('chalk');
-const debug = require('debug')('Header');
-
 // Defining allowOrigin
 const configureHeaders = (req, res, next) => {
   // Allow origin to lan network

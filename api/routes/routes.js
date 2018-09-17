@@ -1,18 +1,18 @@
 const express = require('express');
 const router = express.Router();
 
-// ======================= Middlewares =======================
-const getWelcome = require('./handlers/getWelcome');
-const postSettings = require('./handlers/postSettings');
-const getReceiver = require('./handlers/getReceiver');
-const putReceiver = require('./handlers/putReceiver');
+// ================== Handlers ==================
+const {
+  getWelcome,
+  postSettings,
+  getReceiver,
+  putReceiver,
+  getAllSettings,
+} = require('./handlers');
 
 
 // Root
 router.get('/', getWelcome);
-
-// Upload a file
-router.post('/settings', postSettings);
 
 // Check medea status
 router.get('/status', getReceiver);
@@ -20,6 +20,16 @@ router.get('/status', getReceiver);
 // Change medea Status
 router.put('/status', putReceiver);
 
+
+/** Configuration Files
+* These api routes are made to interact with rtklib config files
+*/
+
+// Get all rtklib settings in conf folder
+router.get('/setting', getAllSettings);
+
+// Upload a new file
+router.post('/setting', postSettings);
 
 
 module.exports = router;

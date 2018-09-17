@@ -1,12 +1,13 @@
 'use strict';
 
 const spawn = require('child_process').spawn;
-const debug = require('debug')('RtkController');
+const logger = require('../logger');
 var path = require('path');
 
-const telnet = require('telnet-client');
+
 const { rtklib } = require('./state');
 const isRunning = require('is-running');
+const { getRtkConfigsFromJson } = require('../logic');
 
 const { confNet } = require('../config');
 
@@ -24,19 +25,20 @@ const initWatcher = (server, cb) => {
 
 /**
  * Launch a rtkrcv instance as a child
- * @param {string} 'configFile'
- * @return {object} 'io'
+ * @param {object} 'io'
  */
-const openRTK = (configFile, io) => {
-  if (!configFile) {
-    configFile = 'rok-rtk.conf';
+const openRTK = (io) => {
+  const configs = getRtkConfigsFromJson();
+
+  if (configs.error) {
+    configs.name = 'default.conf';
   }
   
   const rtkPath = path.join(__dirname, '..', '..', 'rtklib') + '/rtkrcv';
-  const configPath = path.join(__dirname, '..', '..', 'rtklib', 'confs') + '/' + configFile;
+  const configPath = path.join(__dirname, '..', '..', 'rtklib', 'confs') + '/' + configs.name;
 
-  debug('Using this rtkrcv path : ', rtkPath);
-  debug('Using this config path : ', configPath);
+  logger.info('Rtkrcv path : ' + rtkPath);
+  logger.info('Config path : ' + configPath);
 
   // Starts rtkrcv and update the state
   const rtkrcv = spawn(rtkPath, ['-o', configPath, '-w', 'rtkpsswd32', '-p', confNet.telnetPort]);
@@ -45,7 +47,8 @@ const openRTK = (configFile, io) => {
   rtklib.updateState('pid', rtkrcv.pid);
   
   rtkrcv.on('error', (err) => {
-    debug(`${err.toString()}`);
+    const error = err.toString();
+    logger.error(error.substr(error.indexOf('spawn')));
     rtklib.updateState('isOpen', false, io);
     // TODO : Show an error in frontend
   });
@@ -53,10 +56,10 @@ const openRTK = (configFile, io) => {
   rtkrcv.on('exit', (code) => {
     const pid = rtklib.checkState('pid');
     if (!isRunning(pid)) {
-      debug(`rtkrcv process exited with code ${code}`);
+      logger.error(`rtkrcv process exited with code ${code}`);
       rtklib.updateState('isOpen', false, io);
     } else {
-      debug(`rtkrcv error code ${code}, but is still running`);
+      logger.error(`rtkrcv error code ${code}, but is still running`);
     }
   });
 
@@ -82,24 +85,24 @@ const connectTelnet = (server) => {
 
 const initTelnetInstance = (server, io) => {
   server.on('connect', () => {
-    debug('connected to telnet');
+    logger.info('connected to telnet');
     server.send('rtkpsswd32\r\n');
     server.send('start\r\n');
     initWatcher(server, initWatcher);
   });
 
   server.on('timeout', () => {
-    debug('telnet timeout...');
+    logger.warn('telnet timeout...');
   });
 
   server.on('error', (error) => {
-    debug(error);
+    logger.error(error);
   });
 
   server.on('close', () => {
-    debug('Telnet connection closed');
+    logger.info('Telnet connection closed');
     if (rtklib.checkState('isOpen')) {
-      debug(`Trying to connect to telnet ${server}`);
+      logger.info(`Trying to connect to telnet ${server}`);
       setTimeout(connectTelnet, 2500, server);
     }
   });

@@ -1,9 +1,8 @@
 const fs = require('fs');
 
-const chalk = require('chalk');
-const debug = require('debug')('UploadFile');
+const logger = require('../../logger');
 
-const { getClientIp } = require('../../logic');
+const { getClientIp } = require('../../logic/logic');
 
 // takes the settings in base 64 and saves them to a file
 const postSettings = (req, res) => {
@@ -14,10 +13,10 @@ const postSettings = (req, res) => {
   // TODO : Check if the filename exists if exits... rename it with "name + the date"
   fs.writeFile(`RTKLIB/configs/${fileName}`, fileString, (err) => {
     if (err) {
-      debug(chalk.blue(`Error saving the rtkconfig... uploaded by ${ip}`));
+      logger.error(`Error saving the rtkconfig... uploaded by ${ip}`);
       res.status(406).json({ message: 'Error saving the file' });
     } else {
-      debug(chalk.blue(`Rtkconfig has been saved! uploaded by ${ip}`));
+      logger.info(`Rtkconfig has been saved! uploaded by ${ip}`);
       res.status(202).json({ message: 'File successfully updated' });
     }
   });

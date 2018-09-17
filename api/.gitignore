@@ -7,8 +7,9 @@ package-lock.json
 # Ignore envars
 .env
 
-# RTKLIB Configuration files
-RTKLIB/configs/*
+# RTKLIB JSON config file
+RTKLIB/config.json
 rtkrcv.nav
 .vs
 
+logs/

@@ -1,4 +1,4 @@
-const debug = require('debug')('rtkStatus');
+const logger = require('../logger');
 const chalk = require('chalk');
 
 const rtklib = {
@@ -23,10 +23,10 @@ const rtklib = {
   updateState: (type, state, io) => {
     if (this[type] !== state) {
       this[type] = state;
-      debug(`${type} changes to ${state}`);
+      logger.info(`${type} changes to ${state}`);
       // Only sends to clients if it's running
       if (type === 'isRunning') {
-        debug(chalk.blue(`${type} emitted to clients`));
+        logger.info(`${type} emitted to clients`);
         io.emit('rtkrcv_status', { state });
       }
     }

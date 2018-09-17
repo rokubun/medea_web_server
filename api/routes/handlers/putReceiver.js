@@ -1,5 +1,5 @@
 const chalk = require('chalk');
-const debug = require('debug')('RtkReceiver');
+const logger = require('../../logger');
 
 const process = require('process');
 
@@ -11,10 +11,10 @@ const putReceiver = async (req, res) => {
   const { state } = req.body.data;
   const { server, io } = req.body;
   
-  debug(chalk.yellow('Turn rtkrcv', state ? `${chalk.green('ON')}` : `${chalk.red('OFF')}`));
+  logger.info('Turn rtkrcv', state ? 'ON' : 'OFF');
 
   if (state && !checkState('isOpen')) {
-    await openRTK(null, io);
+    await openRTK(io);
     setTimeout(() => (connectTelnet(server)), 2000);
   } else if (checkState('isOpen')) {
       process.kill(rtklib.checkState('pid'));

@@ -1,6 +1,8 @@
-const debug = require('debug')('Medea');
+const logger = require('../logger');
 const whitelist = require('validator/lib/whitelist');
-const chalk = require('chalk');
+const fs = require('fs');
+const path = require('path');
+const { configsPath } = require('../config');
 
 const getClientIp = (req) => {
   let ipAddress;
@@ -40,7 +42,7 @@ const parseData = (data) => {
     try {
       line = nmeaSanitizer(line);
     } catch (err) {
-      debug(err);
+      logger.error(err);
     }
     return line;
   });
@@ -53,7 +55,7 @@ const parseData = (data) => {
 
   if (nmeaFiltered.length !== nmeaSanitized.length) {
     // TODO : Register log files when sentences are wrong
-    debug(chalk.red(`Issues parsing nmea sentences! (from parseData)`));
+    logger.warn(`Issues parsing nmea sentences! (from parseData)`);
   }
 
   return nmeaFiltered;
@@ -189,4 +191,104 @@ const nmeaSanitizer = (line) => {
   return line;
 }
 
-module.exports = { getClientIp, parseData };
+/**
+ * @return {object}
+ */
+const getRtkConfigsFromJson = () => {
+  const jsonPath = path.join(__dirname, '..', 'RTKLIB', 'config.json');
+  let jsonData;
+  if (fs.existsSync(jsonPath)) {
+    try {
+      jsonData = fs.readFileSync(jsonPath);
+    } catch (err) {
+      debug(chalk.red(err));
+      jsonData.error = true;
+    }
+  }
+  return JSON.parse(jsonData);
+}
+/**
+ * @param {string} 'configsPath'
+ * @param {string} 'configName'
+ * @return {object} 'newData'
+ */
+const readConfigFile = (configsPath, configName) => {
+  let newData = {};
+  let stats, data;
+
+  if (configsPath && configName && typeof(configsPath) === 'string' &&
+    typeof(configName) === 'string') {
+
+    try {
+      data = fs.readFileSync(configsPath + '/' + configName) 
+    } catch (error) {
+      logger.error(`Error trying to read a configFile, ${configsPath}/${configName}`);
+    }
+
+    try {
+      stats = fs.statSync(configsPath + '/' + configName);
+    } catch (error) {
+      logger.error(`Error checking stats, ${configsPath}/${configName}`);
+    }
+    
+    if (data && stats) {
+      newData = {
+        name: configName,
+        str: data.toString(),
+        mtime: stats.mtime,
+        size: stats.size,
+      };
+      logger.info(`Succesfully configFile read, ${configsPath}/${configName}`);
+    }
+      
+  }
+  return newData;
+}
+
+/**
+ * This function checks if config.json exits and creates it
+ */
+const settingsToJson = () => {
+  const jsonPath = path.join(__dirname, '..', 'RTKLIB', 'config.json');
+
+  let jsonData = {
+      name: "default.conf",
+      str: "",
+      mtime: "",
+      size: "",
+    };
+  
+  // Read config JSON
+  fs.readFile(jsonPath, 'utf8', (err, data) => {
+    if (err) {
+      // unable to access to the file... create it
+      try {
+        fs.writeFileSync(jsonPath, JSON.stringify(jsonTemplate));
+      } catch (error) {
+        logger.error('Error writing rtk json config');
+      }
+    }
+
+    // Use the data received
+    if (data) {
+      jsonData = JSON.parse(data);
+    }
+
+    if (!fs.existsSync(configsPath + jsonData.name)) {
+      logger.error('Error trying to read rtklib config');
+    } else {
+      // read configFile and returns an object
+      jsonData = readConfigFile(configsPath, jsonData.name);
+        // Save new json config
+        if (data !== jsonData.str) {
+          fs.writeFile(jsonPath, JSON.stringify(newData), (error) => {
+            if (error) {
+              logger.error('Error saving new config');
+            }
+          });
+        }
+    }
+  });
+}
+
+module.exports = { getClientIp, parseData, settingsToJson, getRtkConfigsFromJson, readConfigFile };

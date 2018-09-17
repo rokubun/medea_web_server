@@ -2,11 +2,11 @@ const net = require('net');
 const GPS = require('gps');
 
 const { parseData } = require('../logic');
+const logger = require('../logger');
 
 const whitelist = require('validator/lib/whitelist');
 
-const chalk = require('chalk');
-const debug = require('debug')('Sockets');
+
 
 const { rtklib } = require('../RTKLIB/state');
 
@@ -33,18 +33,18 @@ const initTCPclient = (confNet, cb, io) => {
   const emptiesSentences = ['$GPGSA,A,1,,,,,,,,,,,,,,,*1E', '$GPGSV,1,1,0,,,,,,,,,,,,*49']
 
   const client = net.createConnection(confNet, () => {
-    debug(`Connected to RTKrcv, using ${confNet.host}:${confNet.port}`);
+    logger.info(`Connected to RTKrcv, using ${confNet.host}:${confNet.port}`);
     // Listening RTKlib
     client.on('data', (data) => {
       const nmeaSentences = parseData(data);
       nmeaSentences.forEach((sentence, i) => {
         const sentenceParsed = GPS.Parse(sentence);
         if (sentence === emptiesSentences[0] || sentence === emptiesSentences[1]) {
-          debug(sentence);
+          logger.info(sentence);
           const count = rtklib.checkCount();
           if (count >= 2) {
             io.sockets.emit('empty_gnss_data', true);
-            debug('No receiving gnss data');
+            logger.warn('Receiving empty gnss data');
           }
           rtklib.sumCount();
         } else {
@@ -75,7 +75,7 @@ const initTCPclient = (confNet, cb, io) => {
     // If connections ends... reconnects
     client.on('end', () => {
       const data = { message: 'Disconnected from receiver...' };
-      debug('Disconnected from server');
+      logger.info('Disconnected from server');
       io.emit('disconnected_rtkrcv', data);
       setTimeout(cb, 2000, confNet, cb, io);
     });
@@ -87,13 +87,13 @@ const initTCPclient = (confNet, cb, io) => {
       // It's open and tcp can't connect... send to clients
       if (rtklib.checkState('isOpen')) {
         io.emit('tcp_error', true);
-        debug(chalk.red('Timeout trying to connect...'));
+        logger.info('Timeout trying to connect...');
       }
       setTimeout(cb, 10000, confNet, cb, io);
     }
   });
   
-  debug(`Establishing connection to ${confNet.host}:${confNet.port}`);
+  logger.info(`Establishing connection to ${confNet.host}:${confNet.port}`);
 }
 
 
@@ -101,13 +101,9 @@ const initSocketServer = (io) => {
   const returnIo = io.on('connection', function (client) {
     const ip = whitelist(client.handshake.address, '\\[0-9\.\\]');
 
-    debug(chalk.yellow.bgBlue.bold(ip), chalk.green.bgBlue.bold('Connected via sockets'));
     io.sockets.emit('client-connected');
-    
-    debug(chalk.green.bold(
-      `Sending rtkrcv state to client ${chalk.cyan(rtklib.checkState('isRunning'))}`),
-      chalk.yellow.bgBlue.bold(ip)
-    );
+
+    logger.info(`Connection via sockets => ${ip}`);
     io.sockets.emit('rtkrcv_status', { state: rtklib.checkState('isRunning') });
   
     client.on('disconnect', function () {
