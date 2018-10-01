@@ -59,3 +59,5 @@ app.use(routes);
 http.listen(PORT);
 
 logger.info(`API started on port ${PORT}`);
+
+module.exports = app;
