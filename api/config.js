@@ -17,5 +17,14 @@ const confNet = {
 // Where configs are stored
 const configsPath = path.join(__dirname, '..', 'rtklib', 'confs');
 
+// Medea default settings
+const rtkDefault = {
+  'inpstr1-type': 'serial',
+  'inpstr1-path': 'ttyAMA4:115200:8:n:1:off',
+  'inpstr1-format': 'ubx',
+  'outstr1-type': 'tcpsvr',
+  'outstr1-path': '127.0.0.1:50',
+  'outstr1-format': 'nmea',
+};
 
-module.exports = { PORT, FRONT_PORT, confNet, configsPath };
+module.exports = { PORT, FRONT_PORT, confNet, configsPath, rtkDefault };

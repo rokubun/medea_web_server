@@ -1,7 +1,24 @@
+// Main
 const getWelcome = require('./getWelcome');
-const postSettings = require('./postSettings');
-const getReceiver = require('./getReceiver');
-const putReceiver = require('./putReceiver');
-const getAllSettings = require('./getAllSettings');
 
-module.exports = { getWelcome, postSettings, getReceiver, putReceiver, getAllSettings };
+// Configs
+const addConfig = require('./configs/addConfig');
+const getAllConfigs = require('./configs/getAllConfigs');
+const getActualConfig = require('./configs/getActualConfig');
+const editConfig = require('./configs/editConfig');
+const delConfig = require('./configs/delConfig');
+
+// Status
+const getStatus = require('./status/getStatus');
+const changeStatus = require('./status/changeStatus');
+
+module.exports = {
+  getWelcome,
+  addConfig,
+  editConfig,
+  delConfig,
+  getAllConfigs,
+  getActualConfig,
+  getStatus,
+  changeStatus,
+};

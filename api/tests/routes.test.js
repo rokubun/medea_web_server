@@ -108,7 +108,7 @@ describe('PUT /config [editConfig]', () => {
     request(app)
       .put(`/config/name=${configFile}`)
       .set('Accept', 'application/json')
-      .form({
+      .send({
         'data': defaultData,
       })
       .expect('Content-Type', /json/)
@@ -120,8 +120,8 @@ describe('PUT /config [editConfig]', () => {
     request(app)
       .put(`/config/name=${randomFile}`)
       .set('Accept', 'application/json')
-      .form({
-        'data': randomFile,
+      .send({
+        'data': defaultData,
       })
       .expect('Content-Type', /json/)
       .expect(404, done);
@@ -131,7 +131,7 @@ describe('PUT /config [editConfig]', () => {
     request(app)
       .put(`/config/name=${configFile}`)
       .set('Accept', 'application/json')
-      .form({
+      .send({
         'data': '',
       })
       .expect('Content-Type', /json/)
@@ -142,7 +142,7 @@ describe('PUT /config [editConfig]', () => {
     request(app)
       .put(`/config/name=${configFile}`)
       .set('Accept', 'application/json')
-      .form({
+      .send({
         'data': 'hello i\'m a fantastic dinosaur',
       })
       .expect('Content-Type', /json/)

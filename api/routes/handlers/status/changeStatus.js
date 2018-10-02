@@ -1,13 +1,17 @@
 const chalk = require('chalk');
-const logger = require('../../logger');
+const logger = require('../../../logger');
 
 const process = require('process');
 
-const { openRTK, connectTelnet, sendCommand, checkRTKstatus } = require('../../RTKLIB/controller');
-const { rtklib } = require('../../RTKLIB/state');
+const { openRTK, connectTelnet } = require('../../../RTKLIB/controller');
+const { rtklib } = require('../../../RTKLIB/state');
 const { checkState } = rtklib;
 
-const putReceiver = async (req, res) => {
+/**
+ * PUT METHOD
+ * @param {body} data
+ */
+const changeStatus = async (req, res) => {
   const { state } = req.body.data;
   const { server, io } = req.body;
   
@@ -19,7 +23,7 @@ const putReceiver = async (req, res) => {
   } else if (checkState('isOpen')) {
       process.kill(rtklib.checkState('pid'));
   }
-  res.status(202).json({ message: 'State request successfully' , state: checkState('isRunning')});
+  res.status(200).json({ message: 'State request successfully' , state: checkState('isRunning')});
 }
 
-module.exports = putReceiver;
+module.exports = changeStatus;
