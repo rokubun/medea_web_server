@@ -6,14 +6,6 @@ MEDEA_WEB_SERVER=`dirname $(dirname $(realpath $0))`
 # It will work as long as the last component of the path used to find the script is not a symlink 
 # (directory links are OK)
 
-# Start API process function
-start_api () {
-  cd $MEDEA_WEB_SERVER/api
-  node server.js &
-  PID_API=$!
-  echo "New API PID: $PID_API"
-}
-
 # Setup Wifi as an access point
 connmanctl tether wifi on MEDEA rocboronat
 
@@ -33,17 +25,27 @@ $MEDEA_WEB_SERVER/scripts/start_sara.sh
 # done
 
 # Monitor API and Frontend processes and restart them forever
-start_api
-while true; do
+forever start $MEDEA_WEB_SERVER/api/server.js
 
-  # Restart API process if dead 
-  if kill -0 "$PID_API" >/dev/null 2>&1 ; then
-      # echo "PID API: $PID_API running"
-      :
-  else
-      echo "PID API: $PID_API terminated"
-      start_api
-  fi
-  
-  sleep 3
-done
+# # Forever alternative to keep alive API process
+# start_api () {
+#   cd $MEDEA_WEB_SERVER/api
+#   node server.js &
+#   PID_API=$!
+#   echo "New API PID: $PID_API"
+# }
+# 
+# start_api
+# while true; do
+# 
+#   # Restart API process if dead 
+#   if kill -0 "$PID_API" >/dev/null 2>&1 ; then
+#       # echo "PID API: $PID_API running"
+#       :
+#   else
+#       echo "PID API: $PID_API terminated"
+#       start_api
+#   fi
+#   
+#   sleep 3
+# done
