@@ -27,8 +27,8 @@ const initWatcher = (server, cb) => {
  * Launch a rtkrcv instance as a child
  * @param {object} 'io'
  */
-const openRTK = (io) => {
-  const configs = getRtkConfigsFromJson();
+const openRTK = async (io) => {
+  const configs = await getRtkConfigsFromJson();
 
   if (configs.error) {
     configs.name = 'default.conf';

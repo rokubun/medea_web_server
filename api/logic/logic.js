@@ -192,20 +192,23 @@ const nmeaSanitizer = (line) => {
 }
 
 /**
+ * Is used to get the previous loaded configs stored in a json
  * @return {object}
  */
 const getRtkConfigsFromJson = () => {
   const jsonPath = path.join(__dirname, '..', 'RTKLIB', 'config.json');
-  let jsonData;
-  if (fs.existsSync(jsonPath)) {
-    try {
-      jsonData = fs.readFileSync(jsonPath);
-    } catch (err) {
-      debug(chalk.red(err));
-      jsonData.error = true;
-    }
+  let jsonData = {};
+
+  try {
+    jsonData = fs.readFileSync(jsonPath);
+    jsonData = JSON.parse(jsonData);
+    logger.info(`loaded configs from config.json`);
+  } catch (err) {
+    logger.error(`unable to read config.json using defaults`);
+    jsonData.error = true;
   }
-  return JSON.parse(jsonData);
+
+  return jsonData;
 }
 /**
  * @param {string} 'configsPath'
@@ -222,13 +225,13 @@ const readConfigFile = (configsPath, configName) => {
     try {
       data = fs.readFileSync(configsPath + '/' + configName) 
     } catch (error) {
-      logger.error(`Error trying to read a configFile, ${configsPath}/${configName}`);
+      logger.error(`trying to read a configFile, ${configsPath}/${configName}`);
     }
 
     try {
       stats = fs.statSync(configsPath + '/' + configName);
     } catch (error) {
-      logger.error(`Error checking stats, ${configsPath}/${configName}`);
+      logger.error(`checking stats, ${configsPath}/${configName}`);
     }
     
     if (data && stats) {
@@ -238,7 +241,7 @@ const readConfigFile = (configsPath, configName) => {
         mtime: stats.mtime,
         size: stats.size,
       };
-      logger.info(`Succesfully configFile read, ${configsPath}/${configName}`);
+      logger.info(`Succesfully read configFile, ${configsPath}/${configName}`);
     }
       
   }
@@ -259,31 +262,29 @@ const settingsToJson = () => {
     };
   
   // Read config JSON
-  fs.readFile(jsonPath, 'utf8', (err, data) => {
+  fs.readFile(jsonPath, 'utf8', async (err, data) => {
     if (err) {
       // unable to access to the file... create it
       try {
-        fs.writeFileSync(jsonPath, JSON.stringify(jsonTemplate));
+        fs.writeFileSync(jsonPath, JSON.stringify(jsonData));
       } catch (error) {
-        logger.error('Error writing rtk json config');
+        logger.error(`writing rtk json config ${jsonPath}`);
       }
-    }
-
-    // Use the data received
-    if (data) {
+    } else {
+      // Use the data received
       jsonData = JSON.parse(data);
     }
 
-    if (!fs.existsSync(configsPath + jsonData.name)) {
-      logger.error('Error trying to read rtklib config');
+    if (!fs.existsSync(`${configsPath}/${jsonData.name}`)) {
+      logger.error(`reading rtklib config ${configsPath}/${jsonData.name}`);
     } else {
       // read configFile and returns an object
-      jsonData = readConfigFile(configsPath, jsonData.name);
-        // Save new json config
+      jsonData = await readConfigFile(configsPath, jsonData.name);
+        // Save new json config from configs folder to json folder
         if (data !== jsonData.str) {
-          fs.writeFile(jsonPath, JSON.stringify(newData), (error) => {
+          fs.writeFile(jsonPath, JSON.stringify(jsonData), (error) => {
             if (error) {
-              logger.error('Error saving new config');
+              logger.error('saving new config');
             }
           });
         }

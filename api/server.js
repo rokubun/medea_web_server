@@ -37,7 +37,7 @@ const server = new telnet();
   try {
     await settingsToJson();
   } catch (err) {
-    debug(err);
+    logger.error(err);
   } 
 
   initTelnetInstance(server, io, initTelnetInstance);
