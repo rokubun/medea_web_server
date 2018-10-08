@@ -1,20 +1,24 @@
-const fs = require('fs');
-const logger = require('../../../logger');
-const { getClientIp } = require('../../../logic/logic');
+import fs from 'fs';
+
+import logger from '../../../logger';
+import { getClientIp } from '../../../logic';
+
 
 /**
  * GET METHOD
  */
 const getActualConfig = (req, res) => {
   const ip = getClientIp(req);
-  fs.readFile('../../RTKLIB/config.json', 'utf8',  (err, data) => {
+  fs.readFile('RTKLIB/config.json', 'utf8',  (err, data) => {
     if (err) {
-      logger.error('Unable to use config.json');
+      logger.error(`unable to use config.json by ${ip}`);
+      logger.error(err);
       res.status(406).json({ message: 'Unable to read config.json' });
+    } else {
+      logger.info(`requested rtk config.json by ${ip}`);
+      res.status(200).json({ message: 'Successfully read', config: data });
     }
-    logger.info(`Requested rtk config.json by ${ip}`);
-    res.status(200).json(data);
   });
 }
 
-module.exports = getActualConfig;
+export default getActualConfig;

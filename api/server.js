@@ -1,25 +1,35 @@
 'use strict';
 
-require('dotenv').config();
+import dotenv from 'dotenv';
 
-const telnet = require('telnet-client');
-const bodyParser = require('body-parser');
-const express = require('express');
+dotenv.config();
 
-const { PORT, confNet } = require('./config');
-const { initTCPclient, initSocketServer } = require('./events');
-const { openRTK, connectTelnet, initTelnetInstance } = require('./RTKLIB/controller');
-const logger = require('./logger');
+import telnet from 'telnet-client';
+import bodyParser from 'body-parser';
+import express from 'express';
+import { Server } from 'http';
+
+import { PORT, confNet } from './config';
+import { initTCPclient, initSocketServer } from './events';
+
+import {
+  openRTK,
+  connectTelnet,
+  initTelnetInstance
+} from './RTKLIB/controller';
+
+import logger from './logger';
 
 // Middlewares and routes
-const configureHeaders = require('./middlewares/headers');
-const routes = require('./routes/routes');
+import configureHeaders from './middlewares/headers'
+import routes from './routes';
 
 // Declare an express instance
 const app = express();
-const http = require('http').Server(app);
+const http = Server(app);
 
-const { settingsToJson } = require('./logic')
+import { settingsToJson } from './logic'; 
+
 // Parsing body requests
 app.use(bodyParser.urlencoded({ extended: false }))
 app.use(bodyParser.json())
@@ -28,7 +38,9 @@ app.use(bodyParser.json())
 app.use(configureHeaders);
 
 // Create the instances
-const io = require('socket.io')(http);
+import socketIo from 'socket.io';
+const io = socketIo(http);
+
 const server = new telnet();
 
 
@@ -60,4 +72,4 @@ http.listen(PORT);
 
 logger.info(`API started on port ${PORT}`);
 
-module.exports = app;
+export default app;

@@ -18,4 +18,4 @@ const configureHeaders = (req, res, next) => {
   next();
 }
 
-module.exports = configureHeaders;
+export default configureHeaders;

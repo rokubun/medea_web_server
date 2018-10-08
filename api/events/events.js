@@ -1,14 +1,13 @@
-const net = require('net');
-const GPS = require('gps');
+import net from 'net';
+import GPS from 'gps';
 
-const { parseData } = require('../logic');
-const logger = require('../logger');
+import { parseData } from '../logic';
+import logger from '../logger';
 
-const whitelist = require('validator/lib/whitelist');
+import whitelist from 'validator/lib/whitelist';
 
 
-
-const { rtklib } = require('../RTKLIB/state');
+import { rtklib } from '../RTKLIB/state';
 
 const gps = new GPS;
 
@@ -126,4 +125,4 @@ const initSocketServer = (io) => {
   return returnIo;
 }
 
-module.exports = { initTCPclient, initSocketServer, gps }
+export { initTCPclient, initSocketServer, gps }

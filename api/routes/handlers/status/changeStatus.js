@@ -1,10 +1,9 @@
-const chalk = require('chalk');
-const logger = require('../../../logger');
+import process from 'process';
 
-const process = require('process');
+import logger from '../../../logger';
+import { openRTK, connectTelnet } from '../../../RTKLIB/controller';
+import { rtklib } from '../../../RTKLIB/state';
 
-const { openRTK, connectTelnet } = require('../../../RTKLIB/controller');
-const { rtklib } = require('../../../RTKLIB/state');
 const { checkState } = rtklib;
 
 /**
@@ -26,4 +25,4 @@ const changeStatus = async (req, res) => {
   res.status(200).json({ message: 'State request successfully' , state: checkState('isRunning')});
 }
 
-module.exports = changeStatus;
+export default changeStatus;

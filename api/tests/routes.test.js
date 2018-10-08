@@ -1,7 +1,8 @@
-const request = require('supertest');
-const app = require('../server');
-const { assert, expect } = require('chai');
-const fs = require('fs');
+import request from 'supertest';
+import app from '../server';
+
+import { assert, expect } from 'chai';
+import fs from 'fs';
 
 
 console.log('\tRoutes Tests');
@@ -74,7 +75,7 @@ const defaultData = fs.readFileSync(`${__dirname}/defaults_test.conf`).toString(
 describe('GET /config [getActualConfig]', () => {
   it('should respond with json', (done) => {
     request(app)
-      .get('/config')
+      .get('/storage')
       .set('Accept', 'application/json')
       .expect('Content-Type', /json/)
       .expect(200, done);

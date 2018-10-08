@@ -1,8 +1,8 @@
-const express = require('express');
+import express from 'express';
 const router = express.Router();
 
 // ================== Handlers ==================
-const {
+import {
   getWelcome,
   getStatus,
   changeStatus,
@@ -11,7 +11,8 @@ const {
   delConfig,
   editConfig,
   getAllConfigs,
-} = require('./handlers');
+  editCurrentConfig,
+} from './handlers';
 
 
 // Main
@@ -35,8 +36,10 @@ router.put('/status', changeStatus);
  */
 
 
-// Get the actual config in use
-router.get('/config', getActualConfig);
+// Current configs in use
+router.get('/storage', getActualConfig);
+router.put('/storage/name=:name', editCurrentConfig);
+
 
 // Upload a new config file
 router.post('/config', addConfig);
@@ -51,4 +54,4 @@ router.put('/config/name=:name', editConfig);
 router.get('/configs', getAllConfigs);
 
 
-module.exports = router;
+export default router;

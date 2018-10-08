@@ -1,10 +1,8 @@
-const fs = require('fs');
+import fs from 'fs';
 
-const logger = require('../../../logger');
-
-const { getClientIp } = require('../../../logic/logic');
-
-const { configsPath } = require('../../../config');
+import logger from '../../../logger';
+import { getClientIp } from '../../../logic';
+import { configsPath } from '../../../config';
 
 /** 
  * POST METHOD
@@ -19,13 +17,13 @@ const addConfig = (req, res) => {
   // TODO : Check if the filename exists if exits... rename it with "name + the date"
   fs.writeFile(`${configsPath}/${fileName}`, fileString, (err) => {
     if (err) {
-      logger.error(`Error saving the rtkconfig... uploaded by ${ip}`);
+      logger.error(`saving the rtkconfig... uploaded by ${ip}`);
       res.status(406).json({ message: 'Error saving the file', error: err });
     } else {
-      logger.info(`Rtkconfig has been saved! uploaded by ${ip}`);
+      logger.info(`rtkconfig has been saved! uploaded by ${ip}`);
       res.status(200).json({ message: 'File successfully updated' });
     }
   });
 }
 
-module.exports = addConfig;
+export default addConfig;

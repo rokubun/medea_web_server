@@ -1,24 +1,26 @@
 // Main
-const getWelcome = require('./getWelcome');
+import getWelcome from './getWelcome';
 
 // Configs
-const addConfig = require('./configs/addConfig');
-const getAllConfigs = require('./configs/getAllConfigs');
-const getActualConfig = require('./configs/getActualConfig');
-const editConfig = require('./configs/editConfig');
-const delConfig = require('./configs/delConfig');
+import addConfig from './configs/addConfig';
+import getAllConfigs from './configs/getAllConfigs';
+import getActualConfig from './configs/getActualConfig';
+import editCurrentConfig from './configs/editCurrentConfig';
+import editConfig from './configs/editConfig';
+import delConfig from './configs/delConfig';
 
 // Status
-const getStatus = require('./status/getStatus');
-const changeStatus = require('./status/changeStatus');
+import getStatus from './status/getStatus';
+import changeStatus from './status/changeStatus';
 
-module.exports = {
+export {
   getWelcome,
   addConfig,
   editConfig,
   delConfig,
   getAllConfigs,
   getActualConfig,
+  editCurrentConfig,
   getStatus,
   changeStatus,
 };

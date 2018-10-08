@@ -1,15 +1,15 @@
 'use strict';
 
-const spawn = require('child_process').spawn;
-const logger = require('../logger');
-var path = require('path');
+import { spawn } from 'child_process';
+import logger from '../logger';
+import path from 'path';
 
 
-const { rtklib } = require('./state');
-const isRunning = require('is-running');
-const { getRtkConfigsFromJson } = require('../logic');
+import { rtklib } from './state';
+import isRunning from 'is-running';
+import { getRtkConfigsFromJson } from '../logic';
 
-const { confNet } = require('../config');
+import { confNet } from '../config';
 
 const sendCommand = (command, server) => {
   server.send(command + '\r\n');
@@ -133,8 +133,7 @@ const initTelnetInstance = (server, io) => {
   });
 }
 
-
-module.exports = {
+export {
   openRTK,
   connectTelnet,
   sendCommand,

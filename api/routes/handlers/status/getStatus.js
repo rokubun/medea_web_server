@@ -1,4 +1,4 @@
-const { rtklib } = require('../../../RTKLIB/state');
+import { rtklib } from '../../../RTKLIB/state';
 const { checkState } = rtklib;
 
 /**
@@ -10,4 +10,4 @@ const getStatus = (req, res) => {
   res.status(200).json({ isRunning, isOpen });
 }
 
-module.exports = getStatus;
+export default getStatus;

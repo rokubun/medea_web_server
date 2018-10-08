@@ -1,8 +1,8 @@
-const logger = require('../logger');
-const whitelist = require('validator/lib/whitelist');
-const fs = require('fs');
-const path = require('path');
-const { configsPath } = require('../config');
+import logger from '../logger';
+import whitelist from 'validator/lib/whitelist';
+import fs from 'fs';
+import path from 'path';
+import { configsPath } from '../config';
 
 const getClientIp = (req) => {
   let ipAddress;
@@ -33,7 +33,6 @@ const getClientIp = (req) => {
  * @param {buffer} 'data'
  */
 const parseData = (data) => {
-  const { gps } = require('../events');
   let nmeaSentences = data.toString().split('\r\n');
 
   nmeaSentences = nmeaSentences.filter(line => (line.length !== 0));
@@ -339,7 +338,7 @@ const isRtkConfig = (data) => {
   return /[a-z-A-Z-0-9-(). #=,:]/.test(data);
 }
 
-module.exports = {
+export {
   getClientIp,
   parseData,
   settingsToJson,

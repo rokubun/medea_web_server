@@ -1,5 +1,11 @@
-const { createLogger, transports, format } = require('winston');
-const chalk = require('chalk');
+import {
+  createLogger,
+  transports,
+  format,
+} from 'winston';
+
+import chalk from 'chalk';
+
 
 const { combine, timestamp, printf } = format;
 
@@ -42,4 +48,4 @@ if (process.env.NODE_ENV !== 'production') {
   }));
 }
 
-module.exports = logger;
+export default logger;

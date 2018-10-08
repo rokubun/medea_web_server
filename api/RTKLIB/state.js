@@ -1,5 +1,4 @@
-const logger = require('../logger');
-const chalk = require('chalk');
+import logger from '../logger';
 
 const rtklib = {
   isOpen: false,
@@ -37,4 +36,4 @@ const rtklib = {
   },
 };
 
-module.exports = { rtklib };
+export { rtklib };

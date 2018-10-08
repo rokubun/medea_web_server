@@ -1,9 +1,14 @@
-const fs = require('fs');
+import fs from 'fs';
 
-const logger = require('../../../logger');
+import logger from '../../../logger';
 
-const { configsPath, rtkDefault } = require('../../../config');
-const { parseRtkConfigs, isRtkConfig } = require('../../../logic');
+import { configsPath, rtkDefault } from '../../../config';
+
+import {
+  parseRtkConfigs,
+  isRtkConfig,
+  getClientIp,
+} from '../../../logic';
 
 /**
  * PUT METHOD
@@ -11,12 +16,13 @@ const { parseRtkConfigs, isRtkConfig } = require('../../../logic');
  * @param {body} data
  */
 const editConfig = (req, res) => {
+  const ip = getClientIp(req);
   const fileName = req.params.name;
   const { data } = req.body;
   let rtkConfigs = '';
   const pathToFile = `${configsPath}/${fileName}`;
 
-  if (data.length !== 0) {
+  if (data) {
     rtkConfigs = parseRtkConfigs(data);
   }
   
@@ -27,14 +33,14 @@ const editConfig = (req, res) => {
   const anyOption = (option) => (arr = rtkOptions, fn = option) => (arr.some(fn));
   const rtkMatches = rtkDefaultOptions.filter(anyOption).length;
 
-  if (rtkMatches === rtkDefaultOptions.length && data.length !== 0) {
+  if (data && rtkMatches === rtkDefaultOptions.length) {
     if (fs.existsSync(pathToFile)) {
       fs.writeFile(pathToFile, data, (err) => {
         if (err) {
-          logger.error('Error editing the config');
+          logger.error(`${fileName} edited by ${ip}`);
           res.status(500).json({ message: 'Error editing the file' });
         } else {
-          logger.info('Sucessfully edited');
+          logger.info(`sucessfully edited by ${ip}`);
           res.status(200).json({ message: 'Succesfully edited' });
         }
       });
@@ -46,4 +52,4 @@ const editConfig = (req, res) => {
   }
 }
 
-module.exports = editConfig;
+export default editConfig;

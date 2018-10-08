@@ -1,7 +1,9 @@
 // Loading envars
-require('dotenv').config();
+import dotenv from 'dotenv';
 
-const path = require('path');
+dotenv.config();
+
+import path from 'path';
 
 const PORT = process.env.PORT || 3005;
 
@@ -27,4 +29,11 @@ const rtkDefault = {
   'outstr1-format': 'nmea',
 };
 
-module.exports = { PORT, FRONT_PORT, confNet, configsPath, rtkDefault };
+
+export {
+  PORT,
+  FRONT_PORT,
+  confNet,
+  configsPath,
+  rtkDefault,
+};
