@@ -25,7 +25,7 @@ $MEDEA_WEB_SERVER/scripts/start_sara.sh
 # done
 
 # Monitor API and Frontend processes and restart them forever
-forever start $MEDEA_WEB_SERVER/api/server.js
+forever start -c "npm start" $MEDEA_WEB_SERVER/api/server.js
 
 # # Forever alternative to keep alive API process
 # start_api () {
