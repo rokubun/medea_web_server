@@ -13,17 +13,18 @@ import {
 /**
  * PUT METHOD
  * @param {params} name
- * @param {body} data
+ * @param {body} configs
  */
 const editConfig = (req, res) => {
   const ip = getClientIp(req);
   const fileName = req.params.name;
-  const { data } = req.body;
+  const { configs } = req.body;
   let rtkConfigs = '';
   const pathToFile = `${configsPath}/${fileName}`;
 
-  if (data) {
-    rtkConfigs = parseRtkConfigs(data);
+
+  if (configs) {
+    rtkConfigs = parseRtkConfigs(configs);
   }
   
   const rtkOptions = Object.getOwnPropertyNames(rtkConfigs);
@@ -33,9 +34,9 @@ const editConfig = (req, res) => {
   const anyOption = (option) => (arr = rtkOptions, fn = option) => (arr.some(fn));
   const rtkMatches = rtkDefaultOptions.filter(anyOption).length;
 
-  if (data && rtkMatches === rtkDefaultOptions.length) {
+  if (configs && rtkMatches === rtkDefaultOptions.length) {
     if (fs.existsSync(pathToFile)) {
-      fs.writeFile(pathToFile, data, (err) => {
+      fs.writeFile(pathToFile, configs, (err) => {
         if (err) {
           logger.error(`${fileName} edited by ${ip}`);
           res.status(500).json({ message: 'Error editing the file' });
