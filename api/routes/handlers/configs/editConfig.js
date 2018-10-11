@@ -2,7 +2,7 @@ import fs from 'fs';
 
 import logger from '../../../logger';
 
-import { configsPath, rtkDefault } from '../../../config';
+import { rtkDefault } from '../../../config';
 
 import {
   parseRtkConfigs,
@@ -19,6 +19,7 @@ const editConfig = (req, res) => {
   const ip = getClientIp(req);
   const fileName = req.params.name;
   const { configs } = req.body;
+  const { configsPath } = req.custom;
   let rtkConfigs = '';
   const pathToFile = `${configsPath}/${fileName}`;
 

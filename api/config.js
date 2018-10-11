@@ -14,10 +14,13 @@ const confNet = {
   port: process.env.TCP_PORT || 50,
   telnetPort: process.env.TELNET_PORT || 49,
   host: process.env.HOST || '127.0.0.1'
-}
+};
 
 // Where configs are stored
-const configsPath = path.join(__dirname, '..', 'rtklib', 'confs');
+const configsPath = {
+  rtklib: path.join(__dirname, '..', 'rtklib', 'confs'),
+  ublox: path.join(__dirname, '..', 'ublox', 'confs'),
+};
 
 // Medea default settings
 const rtkDefault = {

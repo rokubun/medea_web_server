@@ -2,7 +2,6 @@ import fs from 'fs';
 
 import logger from '../../../logger';
 import { getClientIp } from '../../../logic';
-import { configsPath } from '../../../config';
 
 
 /**
@@ -10,6 +9,7 @@ import { configsPath } from '../../../config';
  * @param {params} name
  */
 const editCurrentConfig = (req, res) => {
+  const { configsPath } = req.custom;
   const ip = getClientIp(req);
   const nameSelected = req.params.name;
 
@@ -27,7 +27,7 @@ const editCurrentConfig = (req, res) => {
     if (files.indexOf(nameSelected) !== -1) {
       fs.writeFile('RTKLIB/config.json', data, (err) => {
         if (err) {
-          logger.error('updating current config file');
+          logger.error('updating config.json');
           res.status(406).json({ message: 'Unable to edit the config' });
         }
         logger.info(`config.json updated by ${ip}`);

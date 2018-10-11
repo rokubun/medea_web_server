@@ -2,7 +2,6 @@ import fs from 'fs';
 
 import logger from '../../../logger';
 import { getClientIp } from '../../../logic';
-import { configsPath } from '../../../config';
 
 /** 
  * POST METHOD
@@ -11,19 +10,29 @@ import { configsPath } from '../../../config';
  */
 const addConfig = (req, res) => {
   const ip = getClientIp(req);
-  const fileName = req.body.file.name;
-  const fileData = new Buffer.from(req.body.file.data, 'base64');
-  const fileString = fileData.toString();
-  // TODO : Check if the filename exists if exits... rename it with "name + the date"
-  fs.writeFile(`${configsPath}/${fileName}`, fileString, (err) => {
-    if (err) {
-      logger.error(`saving the rtkconfig... uploaded by ${ip}`);
-      res.status(406).json({ message: 'Error saving the file', error: err });
+  const { file } = req.body;
+  const { configsPath, type } = req.custom;
+  let dataParsed = new Buffer.from(file.data, 'base64')
+  dataParsed = dataParsed.toString();
+  try {
+    const files = fs.readdirSync(configsPath);
+    if (files.indexOf(file.name) === -1) {
+      fs.writeFile(`${configsPath}/${file.name}`, dataParsed, (err) => {
+        if (err) {
+          logger.error(`[${type}] saving the config... uploaded by ${ip}`);
+          res.status(406).json({ message: 'Error saving the file', error: err });
+        } else {
+          logger.info(`[${type}] config has been saved! uploaded by ${ip}`);
+          res.status(200).json({ message: 'File successfully updated' });
+        }
+      });
     } else {
-      logger.info(`rtkconfig has been saved! uploaded by ${ip}`);
-      res.status(200).json({ message: 'File successfully updated' });
+      logger.info(`[${type}] ${ip} tried to upload a file with a name used`);
+      res.status(409).json({ message: 'There is a file with the same name' });
     }
-  });
+  } catch (error) {
+    logger.error(`reading the dir ${configsPath}`);
+  }
 }
 
 export default addConfig;

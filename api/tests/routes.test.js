@@ -62,6 +62,7 @@ describe('PUT /status [changeStatus]', () => {
   });
 });
 
+const randomFile = `random_file_${Math.floor(Math.random() * 9999).toString()}`;
 
 /**
  * Configs methods
@@ -70,9 +71,9 @@ describe('PUT /status [changeStatus]', () => {
 // Placeholder configName to test the http methods
 const configFile = 'test_this_please.conf';
 
-const defaultData = fs.readFileSync(`${__dirname}/defaults_test.conf`).toString();
+const rtkConfigData = fs.readFileSync(`${__dirname}/defaults/defaults_test.conf`).toString();
 
-describe('GET /config [getActualConfig]', () => {
+describe('GET /storage [getActualConfig]', () => {
   it('should respond with json', (done) => {
     request(app)
       .get('/storage')
@@ -82,11 +83,10 @@ describe('GET /config [getActualConfig]', () => {
   });
 });
 
-
-describe('POST /config [addConfig]', () => {
-  it('should respond with json', (done) => {
+describe('POST /rtklib/config [addConfig]', () => {
+  it('upload a normal file in base64 (code 200)', (done) => {
     request(app)
-    .post('/config')
+    .post('/rtklib/config')
     .send({
       file: {
         name: configFile,
@@ -101,81 +101,201 @@ describe('POST /config [addConfig]', () => {
       done();
     });
   });
-});
 
-
-describe('PUT /config [editConfig]', () => {
-  it('should respond with json and code 200', (done) => {
+  it('upload a file with a name taken (code 409)', (done) => {
     request(app)
-      .put(`/config/name=${configFile}`)
-      .set('Accept', 'application/json')
+      .post('/rtklib/config')
       .send({
-        'data': defaultData,
+        file: {
+          name: configFile,
+          data: 'dGVzdA==',
+        }
       })
-      .expect('Content-Type', /json/)
-      .expect(200, done);
-  });
-
-  it('should respond with json and code 404', (done) => {
-    const randomFile = `edit_this_${Math.floor(Math.random() * 9999).toString()}.conf`;
-    request(app)
-      .put(`/config/name=${randomFile}`)
-      .set('Accept', 'application/json')
-      .send({
-        'data': defaultData,
-      })
-      .expect('Content-Type', /json/)
-      .expect(404, done);
-  });
-
-  it('should respond with json and code 400', (done) => {
-    request(app)
-      .put(`/config/name=${configFile}`)
-      .set('Accept', 'application/json')
-      .send({
-        'data': '',
-      })
-      .expect('Content-Type', /json/)
-      .expect(400, done);
-  });
-
-  it('should respond with json and code 400', (done) => {
-    request(app)
-      .put(`/config/name=${configFile}`)
-      .set('Accept', 'application/json')
-      .send({
-        'data': 'hello i\'m a fantastic dinosaur',
-      })
-      .expect('Content-Type', /json/)
-      .expect(400, done);
-  });
-})
-
-describe('DEL /config [delConfig]', () => {
-  it('should respond with json and code 200', (done) => {
-    request(app)
-      .delete(`/config/name=${configFile}`)
       .set('Accept', 'application/json')
       .expect('Content-Type', /json/)
-      .expect(200, done);
-  });
-
-  it('should respond with json and code 404', (done) => {
-    request(app)
-      .delete(`/config/name=${configFile}`)
-      .set('Accept', 'application/json')
-      .expect('Content-Type', /json/)
-      .expect(404, done);
+      .expect(409)
+      .end(function (err, res) {
+        if (err) return done(err);
+        done();
+      });
   });
 });
 
-describe('GET /configs [getAllConfigs]', () => {
+describe('PUT /rtklib/config [editConfig]', () => {
+  it('(code 200) should edit the config', (done) => {
+    request(app)
+    .put(`/rtklib/config/name/${configFile}`)
+    .set('Accept', 'application/json')
+    .send({
+      configs: rtkConfigData,
+    })
+    .expect('Content-Type', /json/)
+    .expect(200, done);
+  });
+  
+  it('should respond with json and code 404', (done) => {
+    request(app)
+    .put(`/rtklib/config/name/${randomFile}`)
+    .set('Accept', 'application/json')
+    .send({
+      configs: rtkConfigData,
+    })
+    .expect('Content-Type', /json/)
+    .expect(404, done);
+  });
+  
+  it('should respond with json and code 400', (done) => {
+    request(app)
+    .put(`/rtklib/config/name/${configFile}`)
+    .set('Accept', 'application/json')
+    .send({
+      configs: '',
+    })
+    .expect('Content-Type', /json/)
+    .expect(400, done);
+  });
+  
+  it('should respond with json and code 400', (done) => {
+    request(app)
+    .put(`/rtklib/config/name/${configFile}`)
+    .set('Accept', 'application/json')
+    .send({
+      configs: 'hello i\'m a fantastic dinosaur',
+    })
+    .expect('Content-Type', /json/)
+    .expect(400, done);
+  });
+});
+
+describe('DEL /rtklib/config [delConfig]', () => {
+  it('should respond with json and code 200', (done) => {
+    request(app)
+    .delete(`/rtklib/config/name/${configFile}`)
+    .set('Accept', 'application/json')
+    .expect('Content-Type', /json/)
+    .expect(200, done);
+  });
+  
+  it('should respond with json and code 404', (done) => {
+    request(app)
+    .delete(`/rtklib/config/name/${configFile}`)
+    .set('Accept', 'application/json')
+    .expect('Content-Type', /json/)
+    .expect(404, done);
+  });
+});
+
+describe('GET /rtklib/configs [getAllConfigs]', () => {
   it('should respond with json', (done) => {
     request(app)
-      .get('/configs')
+    .get('/rtklib/configs')
+    .set('Accept', 'application/json')
+    .expect('Content-Type', /json/)
+    .expect(200, done);
+  });
+});
+
+/* Ublox methods */
+
+const ubloxFile = 'test@10Hz.txt';
+
+const ubloxConfigData = fs.readFileSync(`${__dirname}/defaults/rok@10Hz.txt`).toString();
+
+describe('POST ublox/config [addConfig]', () => {
+  it('upload a normal file in base64 (code 200)', (done) => {
+    request(app)
+    .post('/ublox/config')
+    .send({
+      file: {
+        name: ubloxFile,
+        data: ubloxConfigData,
+      }
+    })
+    .set('Accept', 'application/json')
+    .expect('Content-Type', /json/)
+    .expect(200)
+    .end(function (err, res) {
+      if (err) return done(err);
+      done();
+    });
+  });
+  
+  it('upload a file with a name taken (code 409)', (done) => {
+    request(app)
+      .post('/ublox/config')
+      .send({
+        file: {
+          name: ubloxFile,
+          data: ubloxConfigData,
+        }
+      })
+      .set('Accept', 'application/json')
+      .expect('Content-Type', /json/)
+      .expect(409)
+      .end(function (err, res) {
+        if (err) return done(err);
+        done();
+      });
+  });
+});
+
+describe('PUT ublox/bin [loadConfig]', () => {
+  it('(code 200) should load the config and respond with json', (done) => {
+    request(app)
+      .put(`/ublox/config/bin/name/${ubloxFile}`)
+      .send({
+        type: 'ublox'
+      })
+      .set('Accept', 'application/json')
+      .expect('Content-Type', /json/)
+      .expect(200, done);
+  });
+
+  it('(code 404) should NOT load the config and respond with json', (done) => {
+    request(app)
+      .put(`/ublox/config/bin/name/${randomFile}`)
+      .send({
+        type: 'ublox'
+      })
+      .set('Accept', 'application/json')
+      .expect('Content-Type', /json/)
+      .expect(404, done);
+  });
+});
+
+describe('DEL ublox/config [delConfig]', () => {
+  it('should respond with json and code 200', (done) => {
+    request(app)
+      .delete(`/ublox/config/name/${ubloxFile}`)
+      .send({
+        type: 'ublox'
+      })
+      .set('Accept', 'application/json')
+      .expect('Content-Type', /json/)
+      .expect(200, done);
+  });
+
+  it('should respond with json and code 404', (done) => {
+    request(app)
+      .delete(`/ublox/config/name/${ubloxFile}`)
+      .send({
+        type: 'ublox'
+      })
+      .set('Accept', 'application/json')
+      .expect('Content-Type', /json/)
+      .expect(404, done);
+  });
+});
+
+describe('GET ublox/configs [getAllConfigs]', () => {
+  it('should respond with json', (done) => {
+    request(app)
+      .get('/ublox/configs')
+      .send({
+        type: 'ublox',
+      })
       .set('Accept', 'application/json')
       .expect('Content-Type', /json/)
       .expect(200, done);
   });
 });
-  
