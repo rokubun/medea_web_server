@@ -1,5 +1,7 @@
 #!/bin/bash
 
+export NODE_ENV=production
+
 # Get the absolute path of the MEDEA_WEB_SERVER
 # Folders 'api', 'frontend' and 'scripts' shall respect the relative paths used in this script
 MEDEA_WEB_SERVER=`dirname $(dirname $(realpath $0))`
