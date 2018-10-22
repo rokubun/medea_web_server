@@ -10,10 +10,10 @@ import chalk from 'chalk';
 const { combine, timestamp, printf } = format;
 
 const myFormat = printf(info => {
-  if (process.env.NODE_ENV === 'production') {
-    return `${info.timestamp} ${info.level}: ${info.message}`;
-  } else {
+  if (process.env.NODE_ENV === 'development') {
     return chalk.yellow(info.message);
+  } else {
+    return `${info.timestamp} ${info.level}: ${info.message}`;
   }
 });
 
@@ -42,7 +42,7 @@ const logger = createLogger({
 // If we're not in production then log to the `console` with the format:
 // `${info.level}: ${info.message} JSON.stringify({ ...rest }) `
 
-if (process.env.NODE_ENV !== 'production') {
+if (process.env.NODE_ENV === 'development') {
   logger.add(new transports.Console({
     format: format.simple()
   }));

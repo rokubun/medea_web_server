@@ -9,7 +9,7 @@ import bodyParser from 'body-parser';
 import express from 'express';
 import { Server } from 'http';
 
-import { PORT, confNet } from './config';
+import { PORT, confNet, configsPath } from './config';
 import { initTCPclient, initSocketServer } from './events';
 
 import {
@@ -47,7 +47,7 @@ const server = new telnet();
 // Start all services and rtkrcv 
 (async () => {
   try {
-    await settingsToJson();
+    await settingsToJson(configsPath.rtklib);
   } catch (err) {
     logger.error(err);
   } 

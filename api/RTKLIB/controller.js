@@ -50,6 +50,7 @@ const openRTK = async (io) => {
     const error = err.toString();
     logger.error(error.substr(error.indexOf('spawn')));
     rtklib.updateState('isOpen', false, io);
+    rtklib.updateState('isRunning', false, io);
     // TODO : Show an error in frontend
   });
 
@@ -58,6 +59,7 @@ const openRTK = async (io) => {
     if (!isRunning(pid)) {
       logger.error(`rtkrcv process exited with code ${code}`);
       rtklib.updateState('isOpen', false, io);
+      rtklib.updateState('isRunning', false, io);
     } else {
       logger.error(`rtkrcv error code ${code}, but is still running`);
     }

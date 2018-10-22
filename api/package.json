@@ -2,10 +2,10 @@
   "name": "medea-api",
   "version": "0.0.1",
   "description": "Medea API that allows the connection between the frontend with RTKLIB",
-  "main": "server.js",
+  "main": "loader.js",
   "scripts": {
-    "start": "node -r esm server.js",
-    "dev": "nodemon -r esm server.js",
+    "start": "node loader.js",
+    "dev": "nodemon loader.js",
     "test": "mocha -r esm tests --exit --trace-warnings"
   },
   "author": "Waken",
@@ -28,8 +28,7 @@
     "string-to-stream": "^1.1.1",
     "telnet-client": "^0.15.8",
     "validator": "^10.4.0",
-    "winston": "^3.1.0",
-    "forever": "^0.15.3"
+    "winston": "^3.1.0"
   },
   "devDependencies": {
     "mocha": "^5.2.0",

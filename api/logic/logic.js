@@ -2,7 +2,6 @@ import logger from '../logger';
 import whitelist from 'validator/lib/whitelist';
 import fs from 'fs';
 import path from 'path';
-import { configsPath } from '../config';
 
 const getClientIp = (req) => {
   let ipAddress;
@@ -248,9 +247,10 @@ const readConfigFile = (configsPath, configName) => {
 }
 
 /**
- * This function checks if config.json exits and creates it
+ * This function checks if config.json exits and creates it when it doesn't exist
+ * @param {string} configsPath
  */
-const settingsToJson = () => {
+const settingsToJson = (configsPath) => {
   const jsonPath = path.join(__dirname, '..', 'RTKLIB', 'config.json');
 
   let jsonData = {

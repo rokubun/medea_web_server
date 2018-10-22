@@ -8,10 +8,10 @@ const { checkState } = rtklib;
 
 /**
  * PUT METHOD
- * @param {body} data
+ * @param {body} state
  */
 const changeStatus = async (req, res) => {
-  const { state } = req.body.data;
+  const { state } = req.body;
   const { server, io } = req.body;
   
   logger.info('Turn rtkrcv', state ? 'ON' : 'OFF');

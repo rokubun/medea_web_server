@@ -242,7 +242,7 @@ describe('POST ublox/config [addConfig]', () => {
 describe('PUT ublox/bin [loadConfig]', () => {
   it('(code 200) should load the config and respond with json', (done) => {
     request(app)
-      .put(`/ublox/config/bin/name/${ubloxFile}`)
+      .put(`/ublox/bin/name/${ubloxFile}`)
       .send({
         type: 'ublox'
       })
@@ -253,7 +253,7 @@ describe('PUT ublox/bin [loadConfig]', () => {
 
   it('(code 404) should NOT load the config and respond with json', (done) => {
     request(app)
-      .put(`/ublox/config/bin/name/${randomFile}`)
+      .put(`/ublox/bin/name/${randomFile}`)
       .send({
         type: 'ublox'
       })

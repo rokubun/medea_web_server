@@ -9,6 +9,8 @@ const PORT = process.env.PORT || 3005;
 
 const FRONT_PORT = process.env.FRONT_PORT || 80;
 
+const SERIAL_PORT = process.env.SERIAL_PORT || 4;
+
 // * Note : This configuration points to RTKrcv
 const confNet = {
   port: process.env.TCP_PORT || 50,
@@ -21,6 +23,8 @@ const configsPath = {
   rtklib: path.join(__dirname, '..', 'rtklib', 'confs'),
   ublox: path.join(__dirname, '..', 'ublox', 'confs'),
 };
+
+const binPath = path.join(__dirname, '..', 'ublox') + '/u-cfg';
 
 // Medea default settings
 const rtkDefault = {
@@ -36,7 +40,9 @@ const rtkDefault = {
 export {
   PORT,
   FRONT_PORT,
+  SERIAL_PORT,
   confNet,
   configsPath,
+  binPath,
   rtkDefault,
 };
