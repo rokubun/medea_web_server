@@ -5,6 +5,7 @@
   "main": "loader.js",
   "scripts": {
     "start": "node loader.js",
+    "forever": "forever start loader.js",
     "dev": "nodemon loader.js",
     "test": "mocha -r esm tests --exit --trace-warnings"
   },

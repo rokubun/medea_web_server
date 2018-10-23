@@ -1,7 +1,6 @@
 'use strict';
 
 import dotenv from 'dotenv';
-
 dotenv.config();
 
 import telnet from 'telnet-client';
