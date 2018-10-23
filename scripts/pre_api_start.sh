@@ -1,7 +1,5 @@
 #!/bin/bash
 
-export NODE_ENV=production
-
 # Get the absolute path of the MEDEA_WEB_SERVER
 # Folders 'api', 'frontend' and 'scripts' shall respect the relative paths used in this script
 MEDEA_WEB_SERVER=`dirname $(dirname $(realpath $0))`
@@ -28,7 +26,8 @@ $MEDEA_WEB_SERVER/scripts/start_sara.sh
 
 # Monitor API and Frontend processes and restart them forever
 mkdir -p $MEDEA_WEB_SERVER/api/logs
-$MEDEA_WEB_SERVER/api/node_modules/forever/bin/forever start -c "npm start" $MEDEA_WEB_SERVER/api/server.js
+# cd $MEDEA_WEB_SERVER/api
+# forever start -c "npm start" loader.js
 
 # # Forever alternative to keep alive API process
 # start_api () {
