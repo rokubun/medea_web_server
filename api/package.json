@@ -25,6 +25,7 @@
     "moment": "^2.22.2",
     "mongodb": "^3.1.0-beta4",
     "mongoose": "^5.1.1",
+    "pretty-bytes": "^5.1.0",
     "ps-node": "^0.1.6",
     "socket.io": "^2.1.1",
     "string-to-stream": "^1.1.1",

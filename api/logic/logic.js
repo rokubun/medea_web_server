@@ -5,6 +5,7 @@ import whitelist from 'validator/lib/whitelist';
 
 import logger from '../logger';
 
+import prettyBytes from 'pretty-bytes';
 
 const getClientIp = (req) => {
   let ipAddress;
@@ -240,7 +241,7 @@ const readConfigFile = (configsPath, configName) => {
         name: configName,
         str: data.toString(),
         mtime: moment(stats.mtime).format('lll'),
-        size: stats.size,
+        size: prettyBytes(stats.size),
       };
       logger.info(`Succesfully read configFile, ${configsPath}/${configName}`);
     }
