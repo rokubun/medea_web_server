@@ -83,6 +83,25 @@ describe('GET /storage [getActualConfig]', () => {
   });
 });
 
+describe('PUT /storage [editCurrentConfig]', () => {
+  it('should edit the current config (code 200)', (done) => {
+    request(app)
+      .put('/storage/name/default.conf')
+      .set('Accept', 'application/json')
+      .expect('Content-Type', /json/)
+      .expect(200, done);
+  });
+
+  it('should NOT edit the current config (code 404)', (done) => {
+    request(app)
+      .put(`/storage/name/${randomFile}`)
+      .set('Accept', 'application/json')
+      .expect('Content-Type', /json/)
+      .expect(404, done);
+  });
+});
+
+
 describe('POST /rtklib/config [addConfig]', () => {
   it('upload a normal file in base64 (code 200)', (done) => {
     request(app)

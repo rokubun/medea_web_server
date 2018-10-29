@@ -4,12 +4,14 @@ import logger from '../../../logger';
 import { getClientIp } from '../../../logic';
 
 
+
 /**
  * GET METHOD
  */
 const getActualConfig = (req, res) => {
   const ip = getClientIp(req);
-  fs.readFile('RTKLIB/config.json', 'utf8',  (err, data) => {
+  const { rootPath } = req.custom;
+  fs.readFile(`${rootPath}/RTKLIB/config.json`, 'utf8',  (err, data) => {
     if (err) {
       logger.error(`unable to use config.json by ${ip}`);
       logger.error(err);

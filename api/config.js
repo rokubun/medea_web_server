@@ -6,9 +6,7 @@ dotenv.config();
 import path from 'path';
 
 const PORT = process.env.PORT || 3005;
-
 const FRONT_PORT = process.env.FRONT_PORT || 80;
-
 const SERIAL_PORT = process.env.SERIAL_PORT || 4;
 
 // * Note : This configuration points to RTKrcv
@@ -19,9 +17,10 @@ const confNet = {
 };
 
 // Where configs are stored
-const configsPath = {
+const paths = {
   rtklib: path.join(__dirname, '..', 'rtklib', 'confs'),
   ublox: path.join(__dirname, '..', 'ublox', 'confs'),
+  root: __dirname,
 };
 
 const binPath = path.join(__dirname, '..', 'ublox') + '/u-cfg';
@@ -42,7 +41,7 @@ export {
   FRONT_PORT,
   SERIAL_PORT,
   confNet,
-  configsPath,
+  paths,
   binPath,
   rtkDefault,
 };

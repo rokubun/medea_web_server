@@ -6,6 +6,14 @@ import {
 
 import chalk from 'chalk';
 
+import fs from 'fs';
+
+const logsPath = `${__dirname}/logs/`;
+
+// If logs folder doesn't exist create it
+if (!fs.existsSync(logsPath)) {
+  fs.mkdirSync(logsPath);
+}
 
 const { combine, timestamp, printf } = format;
 
@@ -28,13 +36,13 @@ const logger = createLogger({
     // - Write to all logs with level `info` and below to `combined.log` 
     // - Write all logs error (and below) to `error.log`.
     //
-    new transports.File({ filename: 'logs/error.log', level: 'error' }),
-    new transports.File({ filename: 'logs/info.log', level: 'info' }),
-    new transports.File({ filename: 'logs/warnings.log', level: 'warn' }),
+    new transports.File({ filename: `${__dirname}/logs/error.log`, level: 'error' }),
+    new transports.File({ filename: `${__dirname}/logs/info.log`, level: 'info' }),
+    new transports.File({ filename: `${__dirname}/logs/warnings.log`, level: 'warn' }),
     
   ],
   exceptionHandlers: [
-    new transports.File({ filename: 'logs/exceptions.log' })
+    new transports.File({ filename: `${__dirname}/logs/exceptions.log` })
   ]
 });
 

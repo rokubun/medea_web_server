@@ -8,7 +8,7 @@ import bodyParser from 'body-parser';
 import express from 'express';
 import { Server } from 'http';
 
-import { PORT, confNet, configsPath } from './config';
+import { PORT, confNet, paths } from './config';
 import { initTCPclient, initSocketServer } from './events';
 
 import {
@@ -27,11 +27,11 @@ import routes from './routes';
 const app = express();
 const http = Server(app);
 
-import { settingsToJson } from './logic'; 
+import { settingsToJson } from './logic';
 
 // Parsing body requests
-app.use(bodyParser.urlencoded({ extended: false }))
-app.use(bodyParser.json())
+app.use(bodyParser.json({ limit: "5MB", type: 'application/json' }));
+app.use(bodyParser.urlencoded({ extended: false }));
 
 // Middlewares before start routes
 app.use(configureHeaders);
@@ -46,7 +46,7 @@ const server = new telnet();
 // Start all services and rtkrcv 
 (async () => {
   try {
-    await settingsToJson(configsPath.rtklib);
+    await settingsToJson(paths.rtklib);
   } catch (err) {
     logger.error(err);
   } 

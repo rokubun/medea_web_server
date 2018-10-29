@@ -1,6 +1,6 @@
 {
   "name": "medea-api",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Medea API that allows the connection between the frontend with RTKLIB",
   "main": "loader.js",
   "scripts": {
@@ -22,6 +22,7 @@
     "gps": "^0.4.7",
     "ip": "^1.1.5",
     "is-running": "^2.1.0",
+    "moment": "^2.22.2",
     "mongodb": "^3.1.0-beta4",
     "mongoose": "^5.1.1",
     "ps-node": "^0.1.6",

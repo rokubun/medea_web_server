@@ -9,7 +9,7 @@ import { getClientIp } from '../../../logic';
  * @param {params} name
  */
 const editCurrentConfig = (req, res) => {
-  const { configsPath } = req.custom;
+  const { configsPath, rootPath } = req.custom;
   const ip = getClientIp(req);
   const nameSelected = req.params.name;
 
@@ -25,7 +25,7 @@ const editCurrentConfig = (req, res) => {
   try {
     const files = fs.readdirSync(configsPath);
     if (files.indexOf(nameSelected) !== -1) {
-      fs.writeFile('RTKLIB/config.json', data, (err) => {
+      fs.writeFile(`${rootPath}/RTKLIB/config.json`, data, (err) => {
         if (err) {
           logger.error('updating config.json');
           res.status(406).json({ message: 'Unable to edit the config' });

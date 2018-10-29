@@ -1,7 +1,10 @@
-import logger from '../logger';
-import whitelist from 'validator/lib/whitelist';
 import fs from 'fs';
 import path from 'path';
+import moment from 'moment';
+import whitelist from 'validator/lib/whitelist';
+
+import logger from '../logger';
+
 
 const getClientIp = (req) => {
   let ipAddress;
@@ -236,7 +239,7 @@ const readConfigFile = (configsPath, configName) => {
       newData = {
         name: configName,
         str: data.toString(),
-        mtime: stats.mtime,
+        mtime: moment(stats.mtime).format('lll'),
         size: stats.size,
       };
       logger.info(`Succesfully read configFile, ${configsPath}/${configName}`);
