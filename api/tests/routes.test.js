@@ -1,6 +1,8 @@
 import request from 'supertest';
 import app from '../server';
 
+import process from 'process';
+
 import { assert, expect } from 'chai';
 import fs from 'fs';
 
@@ -312,6 +314,111 @@ describe('GET ublox/configs [getAllConfigs]', () => {
       .get('/ublox/configs')
       .send({
         type: 'ublox',
+      })
+      .set('Accept', 'application/json')
+      .expect('Content-Type', /json/)
+      .expect(200, done);
+  });
+});
+
+
+/* Wireless Networks */
+
+describe('GET /wireless/networks [GetAllNetworks]', () => {
+  it('should get all the wireless networks', (done) => {
+    request(app)
+      .get('/wireless/networks')
+      .set('Accept', 'application/json')
+      .expect('Content-Type', /json/)
+      .expect(200, done);
+  });
+});
+
+const ssid = process.env.SSID_NAME || 'ssid';
+const password = process.env.SSID_PASS || 'password';
+
+describe('GET /wireless/network/:ssid [getNetwork]', () => {
+  it('should get a specific network', (done) => {
+    request(app)
+      .get(`/wireless/network/${ssid}`)
+      .set('Accept', 'application/json')
+      .expect('Content-Type', /json/)
+      .expect(200, done);
+  });
+
+  it('should NOT get a specific network', (done) => {
+    request(app)
+      .get(`/wireless/network/${randomFile}`)
+      .set('Accept', 'application/json')
+      .expect('Content-Type', /json/)
+      .expect(404, done);
+  });
+});
+
+describe('PUT /wireless/network [useNetwork]', () => {
+  it('should connect to a network', (done) => {
+    request(app)
+      .put('/wireless/network')
+      .send({
+        ssid,
+        password,
+      })
+      .set('Accept', 'application/json')
+      .expect('Content-Type', /json/)
+      .expect(200, done)
+  });
+
+  it('should NOT found the network', (done) => {
+    request(app)
+      .put('/wireless/network')
+      .send({
+        randomFile,
+        randomFile,
+      })
+      .set('Accept', 'application/json')
+      .expect('Content-Type', /json/)
+      .expect(404, done)
+  });
+
+  it('should responds with a bad request', (done) => {
+    request(app)
+      .put('/wireless/network')
+      .set('Accept', 'application/json')
+      .expect('Content-Type', /json/)
+      .expect(400, done)
+  });
+});
+
+
+/* Tethering */
+
+describe('GET /tethering/status [getStatus]', () => {
+  it('should get the tethering status', (done) => {
+    request(app)
+      .get('/tethering/status')
+      .set('Accept', 'application/json')
+      .expect('Content-Type', /json/)
+      .expect(200, done);
+  });
+});
+
+describe('PUT /tethering/status [useTethering]', () => {
+  it('should turn off tethering', (done) => {
+    request(app)
+      .put('/tethering/status')
+      .send({
+        state: false,
+      })
+      .set('Accept', 'application/json')
+      .expect('Content-Type', /json/)
+      .expect(200, done);
+  });
+
+  it('should turn on tethering', (done) => {
+    request(app)
+      .put('/tethering/status')
+      .send({
+        state: true,
       })
       .set('Accept', 'application/json')
       .expect('Content-Type', /json/)

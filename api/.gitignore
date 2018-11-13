@@ -10,6 +10,10 @@ package-lock.json
 # RTKLIB JSON config file
 RTKLIB/config.json
 rtkrcv.nav
-.vs
+.vscode/*
 
 logs/
+
+# nyc coverage builds
+.nyc_output/*
+coverage/*

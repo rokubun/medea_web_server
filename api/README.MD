@@ -44,6 +44,32 @@ You can use an .env file inside root folder.
 NODE_ENV=production
 ```
 
+## How to debug the API remotely
+Sometimes we want to debug the API remotely, for that we will need to some do stuff.
+
+First, to debug easily the medea device you must use a port forwarding via ssh :
+```ssh -f -o ExitOnForwardFailure=yes -L 5858:127.0.0.1:5858 user@medeaip sleep 10```
+
+Next step, configure your IDE to point to localhost, in this case we are using visual studio code :
+```json
+{
+  // Use IntelliSense to learn about possible attributes.
+  // Hover to view descriptions of existing attributes.
+  // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "type": "node",
+      "request": "attach",
+      "name": "Medea Forwarding",
+      "port": 5858
+    }
+  ]
+}
+```
+
+Remember before to launch the attach, via ssh use ```npm run``` and pass it a script name to run it properly, check the available scripts in package.json.
+
 ## Technologies
 ---------------------------------------
 <p align="center">
