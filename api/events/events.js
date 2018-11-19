@@ -1,7 +1,7 @@
 import net from 'net';
 import GPS from 'gps';
 
-import { parseData } from '../logic';
+import { parseData } from '../utils/nmea';
 import logger from '../logger';
 
 import whitelist from 'validator/lib/whitelist';
@@ -39,11 +39,13 @@ const initTCPclient = (confNet, cb, io) => {
       nmeaSentences.forEach((sentence, i) => {
         const sentenceParsed = GPS.Parse(sentence);
         if (sentence === emptiesSentences[0] || sentence === emptiesSentences[1]) {
-          logger.info(sentence);
           const count = rtklib.checkCount();
-          if (count >= 2) {
+          if (count >= 55) {
             io.sockets.emit('empty_gnss_data', true);
-            logger.warn('Receiving empty gnss data');
+            // Every 50 times it logs
+            if ((count/50) % 1 === 0) {
+              logger.warn(`receiving empty gnss data (${count} times)`);
+            }
           }
           rtklib.sumCount();
         } else {
@@ -86,13 +88,13 @@ const initTCPclient = (confNet, cb, io) => {
       // It's open and tcp can't connect... send to clients
       if (rtklib.checkState('isOpen')) {
         io.emit('tcp_error', true);
-        logger.info('Timeout trying to connect...');
+        logger.info('TCP client timeout trying to connect...');
       }
       setTimeout(cb, 10000, confNet, cb, io);
     }
   });
   
-  logger.info(`Establishing connection to ${confNet.host}:${confNet.port}`);
+  logger.info(`TCP client connecting to ${confNet.host}:${confNet.port}`);
 }
 
 

@@ -1,6 +1,0 @@
-{
-  "name": "logic",
-  "version": "1.0.0",
-  "private": true,
-  "main": "./logic.js"
-}

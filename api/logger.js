@@ -4,6 +4,8 @@ import {
   format,
 } from 'winston';
 
+import moment from 'moment';
+
 import chalk from 'chalk';
 
 import fs from 'fs';
@@ -18,18 +20,18 @@ if (!fs.existsSync(logsPath)) {
 const { combine, timestamp, printf } = format;
 
 const myFormat = printf(info => {
-  if (process.env.NODE_ENV === 'development') {
-    return chalk.yellow(info.message);
+  const timeStr = `(${moment(info.timestamp).format('MMMM Do YYYY, h:mm:ss a')})`;
+  if (process.env.NODE_ENV  !== 'production') {
+    return `(${info.level}) ${info.message}\t ${chalk.grey(timeStr)}`;
   } else {
-    return `${info.timestamp} ${info.level}: ${info.message}`;
+    return `(${info.level}) ${info.message}\t${timeStr}`;
   }
 });
 
-
-const logger = createLogger({
+const loggerSettings = {
   format: combine(
     timestamp(),
-    myFormat
+    myFormat,
   ),
   transports: [
     //
@@ -39,20 +41,28 @@ const logger = createLogger({
     new transports.File({ filename: `${__dirname}/logs/error.log`, level: 'error' }),
     new transports.File({ filename: `${__dirname}/logs/info.log`, level: 'info' }),
     new transports.File({ filename: `${__dirname}/logs/warnings.log`, level: 'warn' }),
-    
-  ],
-  exceptionHandlers: [
-    new transports.File({ filename: `${__dirname}/logs/exceptions.log` })
   ]
-});
+}
 
+const logger = createLogger(loggerSettings);
 
-// If we're not in production then log to the `console` with the format:
-// `${info.level}: ${info.message} JSON.stringify({ ...rest }) `
+// Make logs silent when the api runs tests
+if (/mocha/.test(process.argv)) {
+  logger.silent = true;
+}
 
-if (process.env.NODE_ENV === 'development') {
+if (process.env.NODE_ENV !== 'production') {
   logger.add(new transports.Console({
-    format: format.simple()
+    format: format.combine(
+      format.colorize(),
+      format.simple(),
+      myFormat,
+    )
+  }));
+} else {
+  // Only catch exceptions on production
+  logger.add(new transports.File({
+    filename: `${__dirname}/logs/exceptions.log`, exitOnError: false, handleExceptions: true
   }));
 }
 

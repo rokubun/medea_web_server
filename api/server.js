@@ -27,7 +27,7 @@ import routes from './routes';
 const app = express();
 const http = Server(app);
 
-import { settingsToJson } from './logic';
+import { settingsToJson } from './utils/files';
 
 // Parsing body requests
 app.use(bodyParser.json({ limit: "5MB", type: 'application/json' }));

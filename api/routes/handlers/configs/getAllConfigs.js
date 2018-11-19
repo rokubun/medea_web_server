@@ -2,14 +2,15 @@
 import fs from 'fs';
 
 import logger from '../../../logger';
-import { readConfigFile, getClientIp } from '../../../logic';
+import { resolveClientIp } from '../../../utils/resolvers';
+import { readConfigFile } from '../../../utils/files';
 
 /**
  * GET METHOD
  */
 const getAllConfigs = (req, res) => {
   const { configsPath, type } = req.custom;
-  const ip = getClientIp(req);
+  const ip = resolveClientIp(req);
   fs.readdir(configsPath, (error, files) => {
     if (error) {
       logger.error(`reading the ${type} configs folder ${configsPath}, request by ${ip}`);

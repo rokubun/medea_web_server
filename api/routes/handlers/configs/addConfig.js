@@ -1,7 +1,7 @@
 import fs from 'fs';
 
 import logger from '../../../logger';
-import { getClientIp } from '../../../logic';
+import { resolveClientIp } from '../../../utils/resolvers';
 
 /** 
  * POST METHOD
@@ -9,7 +9,7 @@ import { getClientIp } from '../../../logic';
  * @param {body} file
  */
 const addConfig = (req, res) => {
-  const ip = getClientIp(req);
+  const ip = resolveClientIp(req);
   const { file } = req.body;
   const { configsPath, type } = req.custom;
   let dataParsed = new Buffer.from(file.data, 'base64')

@@ -14,6 +14,13 @@ import loadConfig from './configs/ublox/loadConfig';
 import getStatus from './status/getStatus';
 import changeStatus from './status/changeStatus';
 
+// Wireless
+// import getAllNetworks from './wireless/getAllNetworks';
+
+// Tethering
+import getTetherStatus from './tethering/getStatus';
+import useTethering from './tethering/useTethering';
+
 export {
   getWelcome,
   addConfig,
@@ -25,4 +32,7 @@ export {
   getStatus,
   changeStatus,
   loadConfig,
+  // getAllNetworks,
+  getTetherStatus,
+  useTethering,
 };

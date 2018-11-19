@@ -1,6 +1,6 @@
 import fs from 'fs';
 
-import { getClientIp } from '../../../logic';
+import { resolveClientIp } from '../../../utils/resolvers';
 import logger from '../../../logger';
 
 /**
@@ -10,7 +10,7 @@ import logger from '../../../logger';
 const delConfig = (req, res) => {
   const { configsPath, type } = req.custom;
   const fileName = req.params.name;
-  const ip = getClientIp(req);
+  const ip = resolveClientIp(req);
   const filePath = `${configsPath}/${fileName}`;
   fs.unlink(filePath, (error) => {
     if (error) {

@@ -7,7 +7,7 @@ import path from 'path';
 
 import { rtklib } from './state';
 import isRunning from 'is-running';
-import { getRtkConfigsFromJson } from '../logic';
+import { readRtkConfigs } from '../utils/files';
 
 import { confNet } from '../config';
 
@@ -28,7 +28,7 @@ const initWatcher = (server, cb) => {
  * @param {object} 'io'
  */
 const openRTK = async (io) => {
-  const configs = await getRtkConfigsFromJson();
+  const configs = await readRtkConfigs();
 
   if (configs.error) {
     configs.name = 'default.conf';
@@ -38,7 +38,7 @@ const openRTK = async (io) => {
   const configPath = path.join(__dirname, '..', '..', 'rtklib', 'confs') + '/' + configs.name;
 
   logger.info('Rtkrcv path : ' + rtkPath);
-  logger.info('Config path : ' + configPath);
+  logger.info('loaded config ' + configs.name);
 
   // Starts rtkrcv and update the state
   const rtkrcv = spawn(rtkPath, ['-o', configPath, '-w', 'rtkpsswd32', '-p', confNet.telnetPort]);
@@ -94,17 +94,18 @@ const initTelnetInstance = (server, io) => {
   });
 
   server.on('timeout', () => {
-    logger.warn('telnet timeout...');
+    logger.warn('telnet timeout');
   });
 
   server.on('error', (error) => {
-    logger.error(error);
+    const { errno, address, port } = error;
+    logger.error(`Telnet ${errno} ${address}:${port}`);
   });
 
   server.on('close', () => {
     logger.info('Telnet connection closed');
     if (rtklib.checkState('isOpen')) {
-      logger.info(`Trying to connect to telnet ${server}`);
+      logger.info(`trying to connect to telnet ${server}`);
       setTimeout(connectTelnet, 2500, server);
     }
   });

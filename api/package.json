@@ -7,11 +7,12 @@
     "start": "node loader.js",
     "inspect": "node inspect loader.js",
     "forever": "forever start loader.js",
-    "dev": "nodemon loader.js",
+    "dev": "nodemon loader.js --ignore 'RTKLIB/config.json'",
     "test": "mocha -r esm tests --exit --trace-warnings",
     "report": "nyc report",
     "coverage": "nyc --reporter=html --reporter=text mocha -r esm tests --exit",
-    "test-debug": "mocha -r esm tests --exit --trace-warnings --inspect"
+    "test-debug": "mocha -r esm tests --exit --trace-warnings --inspect",
+    "debug-remote-test": "mocha -r esm tests --exit --nolazy --inspect-brk=0.0.0.0:9229"
   },
   "author": "Waken",
   "license": "ISC",

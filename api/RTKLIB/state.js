@@ -22,10 +22,20 @@ const rtklib = {
   updateState: (type, state, io) => {
     if (this[type] !== state) {
       this[type] = state;
-      logger.info(`${type} changes to ${state}`);
+      switch (type) {
+        case 'isOpen':
+          (state) ? logger.info('rtkrcv is not open') : logger.info('rtkrcv is open');
+          break;
+        case 'isRunning':
+          (state) ? logger.info('rtkrcv is not running') : logger.info('rtkrcv is running');
+          break;
+        default:
+          logger.info(`${type} changes to ${state}`);;
+          break;
+      }
       // Only sends to clients if it's running
       if (type === 'isRunning') {
-        logger.info(`${type} emitted to clients`);
+        logger.info(`${type} state emitted to clients`);
         io.emit('rtkrcv_status', { state });
       }
     }

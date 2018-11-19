@@ -1,7 +1,7 @@
 import fs from 'fs';
 
 import logger from '../../../logger';
-import { getClientIp } from '../../../logic';
+import { resolveClientIp } from '../../../utils/resolvers';
 
 
 /**
@@ -10,7 +10,7 @@ import { getClientIp } from '../../../logic';
  */
 const editCurrentConfig = (req, res) => {
   const { configsPath, rootPath } = req.custom;
-  const ip = getClientIp(req);
+  const ip = resolveClientIp(req);
   const nameSelected = req.params.name;
 
   let jsonData = {

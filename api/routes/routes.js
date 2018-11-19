@@ -13,6 +13,8 @@ import {
   getAllConfigs,
   editCurrentConfig,
   loadConfig,
+  // getAllNetworks,
+  getTetherStatus,
 } from './handlers';
 
 import { injectConfigPath } from '../middlewares/injections';
@@ -57,4 +59,9 @@ router.post('/ublox/config', addConfig);
 router.put('/ublox/bin/name/:name', loadConfig);
 
 
+// Wireless & Tethering
+// router.get('/wireless/networks', getAllNetworks);
+
+router.get('/tethering/status', getTetherStatus);
+// router.put('/tethering/status', useTethering);
 export default router;

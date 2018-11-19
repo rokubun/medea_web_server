@@ -6,9 +6,11 @@ import { rtkDefault } from '../../../config';
 
 import {
   parseRtkConfigs,
+  // TODO: use isRtkConfig function
   isRtkConfig,
-  getClientIp,
-} from '../../../logic';
+} from '../../../utils/rtkutils';
+
+import { resolveClientIp } from '../../../utils/resolvers';
 
 /**
  * PUT METHOD
@@ -16,7 +18,7 @@ import {
  * @param {body} configs
  */
 const editConfig = (req, res) => {
-  const ip = getClientIp(req);
+  const ip = resolveClientIp(req);
   const fileName = req.params.name;
   const { configs } = req.body;
   const { configsPath } = req.custom;

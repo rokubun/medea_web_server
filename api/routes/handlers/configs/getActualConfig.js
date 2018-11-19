@@ -1,7 +1,7 @@
 import fs from 'fs';
 
 import logger from '../../../logger';
-import { getClientIp } from '../../../logic';
+import { resolveClientIp } from '../../../utils/resolvers';
 
 
 
@@ -9,7 +9,7 @@ import { getClientIp } from '../../../logic';
  * GET METHOD
  */
 const getActualConfig = (req, res) => {
-  const ip = getClientIp(req);
+  const ip = resolveClientIp(req);
   const { rootPath } = req.custom;
   fs.readFile(`${rootPath}/RTKLIB/config.json`, 'utf8',  (err, data) => {
     if (err) {
