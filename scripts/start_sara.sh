@@ -1,6 +1,11 @@
 #!/bin/bash
 OFONO_SCRIPTS="/usr/share/ofono/scripts"
 
+# Turn SARA on
+source ~/xgpio_functions.sh
+xgpio_high 7
+sleep 10
+
 # Ofonod is already running in background on startup
 #python3 $OFONO_SCRIPTS/unlock-pin "pin" "3782"
 python3 $OFONO_SCRIPTS/enter-pin "pin" "3782"
