@@ -1,40 +1,36 @@
 <h1 align="center" style="color: #52d36c;">Medea API (Back-End)</h1>
 
-![Version](https://d25lcipzij17d.cloudfront.net/badge.svg?id=gh&type=6&v=0.0.1)
-
-The goal of the api is to manage an open software called rtklib to pass information in real-time to all clients connected.
-
-Written with javascript using node.js
+The api goal is to provide different ways to manage the Medea device and get information about the receptor through websockets and http methods.
 
 
 ##  Getting Started
 ### **Pre-requisites**
-- Node.js (recommended v10.1.0)
+- Node.js version 10
+- [Yarn package manager](https://yarnpkg.com/en/docs/install#debian-stable)
 
 ### **Installation**
 Use the following command to install all the dependencies :
 
 ```
-npm install
+yarn
 ```
-
 
 ### **How to use it**
 There are three main scripts that you can run :
 
 * starts the api (used in prod)
 ```
-npm start
+yarn start
 ``` 
 
 * autoreloads the api when there are changes (used in dev)
 ```
-npm run dev
+yarn run dev
 ``` 
 
 * runs tests to check if all is ok
 ```
-npm test
+yarn test
 ``` 
 
 ### **Environment variables**
@@ -43,32 +39,6 @@ You can use an .env file inside root folder.
 ```
 NODE_ENV=production
 ```
-
-## How to debug the API remotely
-Sometimes we want to debug the API remotely, for that we will need to some do stuff.
-
-First, to debug easily the medea device you must use a port forwarding via ssh :
-```ssh -f -o ExitOnForwardFailure=yes -L 5858:127.0.0.1:5858 user@medeaip sleep 10```
-
-Next step, configure your IDE to point to localhost, in this case we are using visual studio code :
-```json
-{
-  // Use IntelliSense to learn about possible attributes.
-  // Hover to view descriptions of existing attributes.
-  // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
-  "version": "0.2.0",
-  "configurations": [
-    {
-      "type": "node",
-      "request": "attach",
-      "name": "Medea Forwarding",
-      "port": 5858
-    }
-  ]
-}
-```
-
-Remember before to launch the attach, via ssh use ```npm run``` and pass it a script name to run it properly, check the available scripts in package.json.
 
 ## Technologies
 ---------------------------------------

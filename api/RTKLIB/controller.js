@@ -28,6 +28,7 @@ const initWatcher = (server, cb) => {
  * @param {object} 'io'
  */
 const openRTK = async (io) => {
+  let rtkrcv;
   const configs = await readRtkConfigs();
 
   if (configs.error) {
@@ -41,7 +42,12 @@ const openRTK = async (io) => {
   logger.info('loaded config ' + configs.name);
 
   // Starts rtkrcv and update the state
-  const rtkrcv = spawn(rtkPath, ['-o', configPath, '-w', 'rtkpsswd32', '-p', confNet.telnetPort]);
+  if (process.env.NODE_ENV !== 'production') {
+    rtkrcv = spawn(rtkPath, ['-o', configPath, '-w', 'rtkpsswd32', '-p', confNet.telnetPort, '-r', '2', '-t', '3']);
+  } else {
+    rtkrcv = spawn(rtkPath, ['-o', configPath, '-w', 'rtkpsswd32', '-p', confNet.telnetPort]);
+  }
+  
   rtklib.updateState('isOpen', true, io);
   rtklib.updateState('isRunning', false, io);
   rtklib.updateState('pid', rtkrcv.pid);
@@ -65,12 +71,6 @@ const openRTK = async (io) => {
     }
   });
 
-}
-
-
-const checkRTKstatus = () => {
-  if (rtklib.isOpen && rtklib.isRunning) { return true; }
-  return false;
 }
 
 /* 
