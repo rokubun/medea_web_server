@@ -7,14 +7,15 @@ import {
   getStatus,
   changeStatus,
   addConfig,
-  getActualConfig,
+  getCurrentConfig,
+  updateCurrentConfig,
   delConfig,
   editConfig,
   getAllConfigs,
-  editCurrentConfig,
   loadConfig,
-  // getAllNetworks,
+  // scanNetworks,
   getTetherStatus,
+  // useTethering,
 } from './handlers';
 
 import { injectConfigPath } from '../middlewares/injections';
@@ -43,8 +44,8 @@ router.put('/status', changeStatus);
 router.use(injectConfigPath);
 
 // Current configs in use
-router.get('/storage', getActualConfig);
-router.put('/storage/name/:name', editCurrentConfig);
+router.get('/storage', getCurrentConfig);
+router.put('/storage/name/:name', updateCurrentConfig);
 
 // Rtklib routes
 router.post('/rtklib/config', addConfig);
@@ -60,7 +61,7 @@ router.put('/ublox/bin/name/:name', loadConfig);
 
 
 // Wireless & Tethering
-// router.get('/wireless/networks', getAllNetworks);
+// router.get('/wireless/networks', scanNetworks);
 
 router.get('/tethering/status', getTetherStatus);
 // router.put('/tethering/status', useTethering);

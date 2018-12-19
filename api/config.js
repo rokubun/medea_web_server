@@ -8,6 +8,8 @@ import path from 'path';
 const PORT = process.env.PORT || 3005;
 const FRONT_PORT = process.env.FRONT_PORT || 80;
 const SERIAL_PORT = process.env.SERIAL_PORT || 4;
+const DB_USER = process.env.DB_USER || 'medea';
+const DB_PASS = process.env.DB_PASS || '123467890';
 
 // * Note : This configuration points to RTKrcv
 const confNet = {
@@ -40,6 +42,8 @@ export {
   PORT,
   FRONT_PORT,
   SERIAL_PORT,
+  DB_USER,
+  DB_PASS,
   confNet,
   paths,
   binPath,

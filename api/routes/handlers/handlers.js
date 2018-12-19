@@ -4,8 +4,8 @@ import getWelcome from './getWelcome';
 // Configs
 import addConfig from './configs/addConfig';
 import getAllConfigs from './configs/getAllConfigs';
-import getActualConfig from './configs/getActualConfig';
-import editCurrentConfig from './configs/editCurrentConfig';
+import getCurrentConfig from './configs/getCurrentConfig';
+import updateCurrentConfig from './configs/updateCurrentConfig';
 import editConfig from './configs/editConfig';
 import delConfig from './configs/delConfig';
 import loadConfig from './configs/ublox/loadConfig';
@@ -15,7 +15,7 @@ import getStatus from './status/getStatus';
 import changeStatus from './status/changeStatus';
 
 // Wireless
-// import getAllNetworks from './wireless/getAllNetworks';
+//import scanNetworks from './wireless/scanNetworks';
 
 // Tethering
 import getTetherStatus from './tethering/getStatus';
@@ -27,12 +27,12 @@ export {
   editConfig,
   delConfig,
   getAllConfigs,
-  getActualConfig,
-  editCurrentConfig,
+  getCurrentConfig,
+  updateCurrentConfig,
   getStatus,
   changeStatus,
   loadConfig,
-  // getAllNetworks,
+  //scanNetworks,
   getTetherStatus,
-  useTethering,
+  // useTethering,
 };

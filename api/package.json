@@ -23,21 +23,21 @@
     "esm": "^3.0.84",
     "express": "^4.16.3",
     "gps": "^0.4.7",
-    "ip": "^1.1.5",
     "is-running": "^2.1.0",
+    "joi": "^14.3.0",
     "moment": "^2.22.2",
-    "node-wifi": "^2.0.4",
+    "mongodb": "^3.1.10",
+    "mongoose": "^5.3.14",
     "pretty-bytes": "^5.1.0",
-    "ps-node": "^0.1.6",
     "socket.io": "^2.1.1",
     "telnet-client": "^0.15.8",
-    "validator": "^10.4.0",
+    "validator": "^10.9.0",
     "winston": "^3.1.0"
   },
   "devDependencies": {
     "chai": "^4.1.2",
     "mocha": "^5.2.0",
-    "nodemon": "^1.17.4",
+    "nodemon": "^1.18.7",
     "nyc": "^13.1.0",
     "supertest": "^3.3.0"
   }

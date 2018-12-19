@@ -3,13 +3,17 @@
 import { spawn } from 'child_process';
 import logger from '../logger';
 import path from 'path';
-
+import fs from 'fs';
 
 import { rtklib } from './state';
 import isRunning from 'is-running';
-import { readRtkConfigs } from '../utils/files';
 
 import { confNet } from '../config';
+
+import { jsonToRtkSettings } from '../utils/rtkutils';
+
+import UserModel from '../database/models/user';
+import { ConfigModel } from '../database/models/config';
 
 const sendCommand = (command, server) => {
   server.send(command + '\r\n');
@@ -28,25 +32,54 @@ const initWatcher = (server, cb) => {
  * @param {object} 'io'
  */
 const openRTK = async (io) => {
-  let rtkrcv;
-  const configs = await readRtkConfigs();
+  // Find the conf name in user document
+  const userDoc = await UserModel.findOne(null, (error, doc) => {
+    if (error) throw `(Database) ${error.errmsg}`;
+    else if (doc === null) {
+      throw '(Database) empty user document, check the database';
+    }
+    return doc;
+  });
 
-  if (configs.error) {
-    configs.name = 'default.conf';
+  // Find the config by the name
+  let configDoc = await ConfigModel.findOne({ name: userDoc.currentConf }, (error, doc) => {
+    if (error) throw `(Database) ${error.errmsg}`;
+    return doc;
+  });
+
+  // If conf not found, use default.conf instead
+  if (configDoc === null) {
+    configDoc = await ConfigModel.findOne({ name: 'default.conf' }, (error, doc) => {
+      if (error) throw `(Database) ${error.errmsg}`;
+      else if (doc === null) {
+        throw '(Database) fatal error... default config is empty, check the database';
+      }
+      return doc;
+    });
   }
   
+  const rtkParams = jsonToRtkSettings(JSON.stringify(configDoc.options));
+  
   const rtkPath = path.join(__dirname, '..', '..', 'rtklib') + '/rtkrcv';
-  const configPath = path.join(__dirname, '..', '..', 'rtklib', 'confs') + '/' + configs.name;
+  const configPath = path.join(__dirname, '..', '..', 'rtklib', 'confs') + '/' + configDoc.name;
 
-  logger.info('Rtkrcv path : ' + rtkPath);
-  logger.info('loaded config ' + configs.name);
+  // Create a temporary file
+  fs.writeFile(configPath, rtkParams, (err) => {
+    if (err) throw '(Controller) Unable to write a config file';
+  });
 
   // Starts rtkrcv and update the state
   if (process.env.NODE_ENV !== 'production') {
-    rtkrcv = spawn(rtkPath, ['-o', configPath, '-w', 'rtkpsswd32', '-p', confNet.telnetPort, '-r', '2', '-t', '3']);
+    var parameters = ['-o', configPath, '-w', 'rtkpsswd32', '-p', confNet.telnetPort, '-r', '2', '-t', '3']
   } else {
-    rtkrcv = spawn(rtkPath, ['-o', configPath, '-w', 'rtkpsswd32', '-p', confNet.telnetPort]);
+    var parameters = ['-o', configPath, '-w', 'rtkpsswd32', '-p', confNet.telnetPort];
   }
+
+  // Starts rtklib child process
+  const rtkrcv = spawn(rtkPath, parameters);
+  
+  // Delete the temporary file
+  fs.unlinkSync(configPath);
   
   rtklib.updateState('isOpen', true, io);
   rtklib.updateState('isRunning', false, io);
@@ -62,15 +95,15 @@ const openRTK = async (io) => {
 
   rtkrcv.on('exit', (code) => {
     const pid = rtklib.checkState('pid');
+    // Check if rtklib is lying and there is not exit
     if (!isRunning(pid)) {
-      logger.error(`rtkrcv process exited with code ${code}`);
       rtklib.updateState('isOpen', false, io);
       rtklib.updateState('isRunning', false, io);
+      logger.error(`rtkrcv process exited with code ${code}`);
     } else {
       logger.error(`rtkrcv error code ${code}, but is still running`);
     }
   });
-
 }
 
 /* 

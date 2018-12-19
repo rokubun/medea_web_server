@@ -6,22 +6,21 @@ const rtklib = {
   pid: 0,
   countEmpties: 0,
   sumCount: () => {
-    if (typeof(this.countEmpties) === 'number') {
-      this.countEmpties += 1;
+    if (typeof (rtklib.countEmpties) === 'number') {
+      rtklib.countEmpties += 1;
     } else {
-      this.countEmpties = 0;
+      rtklib.countEmpties = 0;
     }
   },
   resetCount: () => {
-    this.countEmpties = 0;
+    rtklib.countEmpties = 0;
   },
   checkCount: () => {
-    const count = this.countEmpties;
-    return count;
+    return rtklib.countEmpties;
   },
   updateState: (type, state, io) => {
-    if (this[type] !== state) {
-      this[type] = state;
+    if (rtklib[type] !== state) {
+      rtklib[type] = state;
       switch (type) {
         case 'isOpen':
           (state) ? logger.info('rtkrcv is not open') : logger.info('rtkrcv is open');
@@ -41,8 +40,7 @@ const rtklib = {
     }
   },
   checkState: (type) => {
-    const state = this[type];
-    return state;
+    return rtklib[type];
   },
 };
 
