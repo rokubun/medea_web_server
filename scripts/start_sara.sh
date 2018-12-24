@@ -14,7 +14,7 @@ python3 $OFONO_SCRIPTS/enter-pin "pin" "3782"
 sudo service ofono restart
 python3 $OFONO_SCRIPTS/online-modem
 python3 $OFONO_SCRIPTS/create-internet-context "orangeworld"
-sleep 5
+sleep 10
 python3 $OFONO_SCRIPTS/activate-context
 python3 $OFONO_SCRIPTS/process-context-settings
 
