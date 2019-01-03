@@ -3,18 +3,23 @@
 import dotenv from 'dotenv';
 dotenv.config();
 
-import telnet from 'telnet-client';
+import telnetClient from 'telnet-client';
+import net from 'net';
 import bodyParser from 'body-parser';
 import express from 'express';
+import socketIo from 'socket.io';
 import { Server } from 'http';
 
 import { PORT, confNet, paths } from './config';
-import { initTCPclient, initSocketServer } from './events';
+
+import {
+  listenTelnetEvents,
+  listenSocketsEvents,
+  listenTcpEvents,
+} from './events';
 
 import {
   openRTK,
-  connectTelnet,
-  initTelnetInstance
 } from './RTKLIB/controller';
 
 import logger from './logger';
@@ -29,6 +34,7 @@ const http = Server(app);
 
 import { settingsToJson } from './utils/files';
 import database from './database/connection';
+import db from './database/helpers';
 
 // Parsing body requests
 app.use(bodyParser.json({ limit: "5MB", type: 'application/json' }));
@@ -38,13 +44,10 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(configureHeaders);
 
 // Create the instances
-import socketIo from 'socket.io';
 const io = socketIo(http);
+const tcp = new net.Socket();
+const telnet = new telnetClient();
 
-const server = new telnet();
-
-
-import User from './database/models/user';
 
 /*=============================================
 =            Section Start Services           =
@@ -53,48 +56,42 @@ import User from './database/models/user';
 (async () => {
   await database().connection;
 
-  // Find if the admin user exists and create it if not
-  User.find((err, users) => {
-    if (err) return logger.error(err);
-      if (users.length === 0) {
-        const user = new User({
-          name: 'admin',
-          password: '1234',
-          currentConf: 'default.conf',
-        });
+  try {
+    await db.createDefaultUser();
+  } catch (err) {
+    logger.error(err);
+  }
 
-        user.save((err, user) => {
-          if (err) return logger.error(err);
-          // Create the admin user
-          logger.info('Creating the admin user');
-        });
-      }
-  });
+  try {
+    await db.createDefaultConfig();
+  } catch (err) {
+    logger.error(err);
+  }
 
   try {
     await settingsToJson(paths.rtklib);
   } catch (err) {
     logger.error(err);
   }
-  initTelnetInstance(server, io, initTelnetInstance);
-  initSocketServer(io);
-  
+
+  listenTelnetEvents(telnet, io);
+  listenSocketsEvents(io);
+  listenTcpEvents(tcp, io);
+
   try {
-    await openRTK(io);
+    await openRTK(io, telnet, tcp);
   } catch (err) {
-    logger.error(err);
+    logger.error(err.message);
   }
-  await setTimeout(() => (connectTelnet(server)), 2000);
-  
-  // Initialize RTK Socket Client to receive data from rtkrcv
-  await initTCPclient(confNet, initTCPclient, io);
+
 })();
 
 /*=====  End of Start Services  ======*/
 
 
 // Injections
-app.use((req, res, next) => { req.body.server = server; next(); });
+app.use((req, res, next) => { req.body.telnet = telnet; next(); });
+app.use((req, res, next) => { req.body.tcp = tcp; next(); });
 app.use((req, res, next) => { req.body.io = io; next(); });
 
 app.use(routes);

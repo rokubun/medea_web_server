@@ -6,6 +6,8 @@ import { SERIAL_PORT, binPath } from '../../../../config';
 
 import logger from '../../../../logger';
 
+import UserModel from '../../../../database/models/user';
+
 // Loads the binary with the config file selected
 const loadConfig = (req, res) => {
   const fileName = req.params.name;
@@ -23,13 +25,30 @@ const loadConfig = (req, res) => {
     ubloxBin.on('close', (code) => {
       if (code !== 0) {
         logger.error(`u-cfg exited with code ${code}`);
-        res.status(406).json({ message: 'Error loading the config', output});
+        return res.status(406).json({ message: 'Error loading the config', output});
       } else {
-        res.status(200).json({ message: 'Config succesfully loaded', output });
+        try {
+          const result = UserModel.findOne(null);
+          if (result === null) {
+            logger.info('user not found, unable to update the ubloxPath');
+          } else {
+            try {
+              result.ubloxPath = pathToFile;
+              result.save();
+            } catch (err) {
+              logger.info('unable to save user info');
+            }
+          }
+        } catch (error) {
+          res.status(500).json({ message: 'Server Internal Error' });  
+          throw Error(error);
+        } finally {
+          return res.status(200).json({ message: 'Config succesfully loaded', output });
+        }
       }
     });
   } else {
-    res.status(404).json({ message: 'File not found' });
+    return res.status(404).json({ message: 'File not found' });
   }
 }
 

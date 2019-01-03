@@ -26,21 +26,22 @@ const rtklib = {
           (state) ? logger.info('rtkrcv is not open') : logger.info('rtkrcv is open');
           break;
         case 'isRunning':
-          (state) ? logger.info('rtkrcv is not running') : logger.info('rtkrcv is running');
+          if (state)  {
+            logger.info('rtkrcv is running');
+            io.emit('rtkrcv_status', { state });
+          } else {
+            logger.info('rtkrcv is not running')
+          }
           break;
         default:
           logger.info(`${type} changes to ${state}`);;
           break;
       }
-      // Only sends to clients if it's running
-      if (type === 'isRunning') {
-        logger.info(`${type} state emitted to clients`);
-        io.emit('rtkrcv_status', { state });
-      }
     }
   },
   checkState: (type) => {
-    return rtklib[type];
+    const state = rtklib[type];
+    return state;
   },
 };
 

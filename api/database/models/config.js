@@ -68,7 +68,10 @@ const params = {
   'pos1-posopt5': boolean,
   'pos1-exclsat': String,
   'pos1-navsys': String, // TODO
-  'pos2-armode': String,
+  'pos2-armode': {
+    type: String,
+    enum: ['off', 'continuous', 'instantaneous', 'fix-and-hold']
+  },
   'pos2-varholdamb': String,
   'pos2-gloarmode': {
     type: String,

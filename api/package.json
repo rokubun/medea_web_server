@@ -27,7 +27,7 @@
     "joi": "^14.3.0",
     "moment": "^2.22.2",
     "mongodb": "^3.1.10",
-    "mongoose": "^5.3.14",
+    "mongoose": "^4.x.x",
     "pretty-bytes": "^5.1.0",
     "socket.io": "^2.1.1",
     "telnet-client": "^0.15.8",
