@@ -22,10 +22,12 @@ export default () => {
 
   mongoose.connection.on('error', function (err) {
     logger.error('Mongoose default connection has occured ' + err + ' error');
+    mongoose.disconnect();
   });
 
   mongoose.connection.on('disconnected', function () {
     logger.error('Mongoose default connection is disconnected');
+    mongoose.connect(`mongodb://${DB_USER}:${DB_PASS}@127.0.0.1:27017/local`, options);
   });
 
   process.on('SIGINT', function () {
