@@ -1,24 +1,15 @@
 import { rtklib } from '../../../RTKLIB/state';
+import isRunning from 'is-running';
+
 const { checkState } = rtklib;
 
 /**
  * GET METHOD
  */
 const getStatus = (req, res) => {
-  let isRunning;
-  let isOpen;
-
-  try {
-    isRunning = checkState('isRunning');
-  } catch (err) {
-    throw Error(err);
-  }
-  try {
-    isOpen = checkState('isOpen');
-  } catch (err) {
-    throw Error(err);
-  }
-  return res.status(200).json({ isRunning, isOpen });
+  const pid = checkState('pid');
+  
+  return res.status(200).json({ state: isRunning(pid) });
 }
 
 export default getStatus;

@@ -40,8 +40,7 @@ describe('GET /status [getStatus]', () => {
       .expect('Content-Type', /json/)
       .expect(200)
       .then(response => {
-        assert.isBoolean(response.body.isOpen, 'isOpen');
-        assert.isBoolean(response.body.isRunning, 'isRunning');
+        assert.isBoolean(response.body.state, 'state');
         done();
       })
       .catch(error => {

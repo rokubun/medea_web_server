@@ -38,7 +38,8 @@ const addConfig = (req, res) => {
   if (type === 'rtk') {
     const config = new ConfigModel;
   
-    config.name = file.name;
+    config.name = file.name.slice(0, 12);
+
     config.options = rtkSettingsToObject(dataParsed);
 
     config.save((error, config) => {

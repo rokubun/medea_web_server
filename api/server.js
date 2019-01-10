@@ -33,8 +33,9 @@ const app = express();
 const http = Server(app);
 
 import { settingsToJson } from './utils/files';
-import database from './database/connection';
+import databaseConnection from './database/connection';
 import db from './database/helpers';
+import { connect } from 'tls';
 
 // Parsing body requests
 app.use(bodyParser.json({ limit: "5MB", type: 'application/json' }));
@@ -49,17 +50,22 @@ const tcp = new net.Socket();
 const telnet = new telnetClient();
 
 
+
 /*=============================================
-=            Section Start Services           =
+=            Database Connection              =
 =============================================*/
 
 (async () => {
-  await database().connection;
+  try {
+    databaseConnection();
+  } catch (err) {
+    logger.error(err);
+  }
 
   try {
     await db.createDefaultUser();
   } catch (err) {
-    logger.error(err);
+    logger.error(`mongodb ${err}`);
   }
 
   try {
@@ -67,13 +73,13 @@ const telnet = new telnetClient();
   } catch (err) {
     logger.error(err);
   }
+})();
 
-  try {
-    await settingsToJson(paths.rtklib);
-  } catch (err) {
-    logger.error(err);
-  }
-
+/*=====  End of Database Connection  ======*/
+/*=============================================
+=                Start Services               =
+=============================================*/
+(async () => {
   listenTelnetEvents(telnet, io);
   listenSocketsEvents(io);
   listenTcpEvents(tcp, io);

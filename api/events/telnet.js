@@ -1,5 +1,6 @@
 import logger from '../logger';
 import { rtklib } from '../RTKLIB/state';
+import isRunning from 'is-running';
 
 import { connectTelnet } from '../RTKLIB/clients';
 
@@ -10,7 +11,8 @@ const sendCommand = (command, server) => {
 }
 
 const initWatcher = (server, cb) => {
-  if (rtklib.checkState('isOpen')) {
+  const pid = rtklib.checkState('pid');
+  if (isRunning(pid)) {
     sendCommand('status', server);
     setTimeout(cb, 1000, server, cb);
   }

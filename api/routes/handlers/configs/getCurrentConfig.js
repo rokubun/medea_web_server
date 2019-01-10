@@ -18,7 +18,7 @@ const getCurrentConfig = (req, res) => {
       logger.error('user document seems to be empty');
       return res.status(500).json({ message: 'Internal Server Error' });
     }
-    logger.info(`user config sent to ${ip}`);
+    logger.info(`${ip} received the config name in use`);
     return res.status(200).json({ message: 'Successfully read', name: doc.currentConf });
   });
 }

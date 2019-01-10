@@ -18,7 +18,7 @@ const getAllConfigs = async (req, res) => {
   if (type === 'rtk') {
     try {
       const result = await ConfigModel.find(null);
-      logger.info(`${result.length} configs read and sent by ${ip}`);
+      logger.info(`${result.length} configs read by ${ip}`);
       return res.status(200).json({ message: 'Configs successfully read from db', configs: result });
     } catch (err) {
       return res.status(500).json({ message: '(Database) Internal Server Error' });
@@ -30,7 +30,7 @@ const getAllConfigs = async (req, res) => {
         return res.status(500).json({ message: `Error trying to access to ${type} configs folder` });
       }
       const configs = files.map((fileName) => (readConfigFile(configsPath, fileName)));
-      logger.info(`${configs.length} configs read and sent by ${ip}`);
+      logger.info(`${configs.length} configs read by ${ip}`);
       return res.status(200).json({ message: 'Configs successfully read', configs });
     });
   }

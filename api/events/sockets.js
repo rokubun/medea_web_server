@@ -1,35 +1,28 @@
-import whitelist from 'validator/lib/whitelist';
-
 import logger from '../logger';
 import { rtklib } from '../RTKLIB/state';
+import whitelist from 'validator/lib/whitelist';
 
 /**
  * @param {object} io 
  */
-const listenSocketEvents = async (io) => {
-  let ip;
-  const client = await io.on('connection', (client) => {
-    //logger.info('Socket initializted')  
-    ip = whitelist(client.handshake.address, '\\[0-9\.\\]');
-    return client;
+const listenSocketsEvents = (io) => {
+  io.sockets.on('connection', (client) => {
+    const { remoteAddress } = client.request.connection;
+    const ip = whitelist(remoteAddress, '\\[0-9\.\\]');
+
+    io.sockets.emit('client-connected');
+
+    logger.info(`${ip} connected via sockets`);
+    io.sockets.emit('rtkrcv_status', { state: rtklib.checkState('isRunning') });
+
+    client.on('disconnect', () => {
+      logger.info(`${ip} disconnected from sockets`);
+    });
+
+    client.on('error', (err) => {
+      logger.info(`An error from ${ip} : ${err}`);
+    });
   });
-
-
-  io.sockets.emit('client-connected');
-
-  logger.info(`Connection via sockets => ${ip}`);
-  io.sockets.emit('rtkrcv_status', { state: rtklib.checkState('isRunning') });
-
-  client.on('disconnect', () => {
-    console.log('client disconnected...', client.id);
-  });
-
-  client.on('error', (err) => {
-    console.log('received error from client:', client.id);
-    console.log(err);
-  });
-
-  return client;
 }
 
-export default listenSocketEvents;
+export default listenSocketsEvents;
