@@ -20,7 +20,7 @@ const options = {
 export default () => {
   const db = mongoose.connection;
 
-  const connectUrl = `mongodb://${DB_USER}:${DB_PASS}@192.168.1.250:27017/local`;
+  const connectUrl = `mongodb://${DB_USER}:${DB_PASS}@127.0.0.1:27017/local`;
  
   db.on('connected', () => {
     logger.info('Mongoose connected to database');
