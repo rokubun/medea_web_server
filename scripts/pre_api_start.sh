@@ -7,10 +7,10 @@ MEDEA_WEB_SERVER=`dirname $(dirname $(realpath $0))`
 # (directory links are OK)
 
 # Setup Wifi as an access point
-connmanctl tether wifi on MEDEA rocboronat
+# connmanctl tether wifi on MEDEA rocboronat
 
 # Setup cellular (this might be a redundant step)
-connmanctl enable cellular
+# connmanctl enable cellular
 
 # The corresponding cellular service shall have been configured to autoconnect
 $MEDEA_WEB_SERVER/scripts/start_sara.sh

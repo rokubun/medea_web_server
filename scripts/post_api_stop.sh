@@ -7,10 +7,10 @@ MEDEA_WEB_SERVER=`dirname $(dirname $(realpath $0))`
 # (directory links are OK)
 
 # Setup Wifi as an access point
-connmanctl tether wifi off
+# connmanctl tether wifi off
 
 # Setup cellular (this might be a redundant step)
-connmanctl disable cellular
+# connmanctl disable cellular
 
 # The corresponding cellular service shall have been configured to autoconnect
 $MEDEA_WEB_SERVER/scripts/stop_sara.sh
