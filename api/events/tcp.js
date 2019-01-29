@@ -51,8 +51,8 @@ const listenTcpEvents = (client, io) => {
         rtklib.sumCount();
       } else {
         rtklib.resetCount();
+        // Reset warnings on frontend
         io.sockets.emit('empty_gnss_data', false);
-        io.emit('tcp_error', false);
       }
 
       if (sentence.indexOf('GGA') !== -1) {

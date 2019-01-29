@@ -10,8 +10,6 @@ const listenSocketsEvents = (io) => {
     const { remoteAddress } = client.request.connection;
     const ip = whitelist(remoteAddress, '\\[0-9\.\\]');
 
-    io.sockets.emit('client-connected');
-
     logger.info(`${ip} connected via sockets`);
     io.sockets.emit('rtkrcv_status', { state: rtklib.checkState('isRunning') });
 
