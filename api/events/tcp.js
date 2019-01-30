@@ -78,7 +78,7 @@ const listenTcpEvents = (client, io) => {
     const data = { message: 'Disconnected from receiver...' };
     logger.info('Disconnected from server');
     io.emit('disconnected_rtkrcv', data);
-    setTimeout(connectTcp, 2000, client);
+    setTimeout(() => (connectTcp(client, io)), 2000);
   });
 
   // If an error occurs... reconnects
@@ -90,7 +90,7 @@ const listenTcpEvents = (client, io) => {
         io.emit('tcp_error', true);
         logger.info('TCP client timeout trying to connect...');
       }
-      setTimeout(connectTcp, 10000, client);
+      setTimeout(() => (connectTcp(client, io)), 10000);
     }
   });
 }
