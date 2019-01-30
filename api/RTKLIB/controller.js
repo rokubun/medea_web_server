@@ -16,8 +16,11 @@ import db from '../database/helpers';
 
 
 /**
- * Launch a rtkrcv instance as a child
- * @param {object} 'io'
+ * Launch a rtkrcv instance as a child of node process
+ * It will start a connection to the child via telnet and tcp
+ * @param {object} io
+ * @param {object} telnet
+ * @param {object} tcp
  */
 const openRTK = async (io, telnet, tcp) => {
   let configDoc, userDoc, rtkParams, parameters;
@@ -118,7 +121,7 @@ const openRTK = async (io, telnet, tcp) => {
   // Starts telnet to interact with rtkrcv
   setTimeout(() => (connectTelnet(telnet)), 2000);
   // Starts tcp connection to listen rtkrcv process result
-  setTimeout(() => (connectTcp(tcp)), 2000);
+  setTimeout(() => (connectTcp(tcp, io)), 2000);
 }
 
 export {
