@@ -13,7 +13,7 @@ const { checkState } = rtklib;
  */
 const changeStatus = async (req, res) => {
   const { state } = req.body;
-  const { telnet, tcp, io } = req.body;
+  const { telnet, tcp, io } = req.custom;
   
   logger.info(`Turn rtkrcv ${state ? 'ON' : 'OFF'}`);
   const pid = checkState('pid');

@@ -42,11 +42,15 @@ const openRTK = async (io, telnet, tcp) => {
     // Find the config by the name
     try {
       configDoc = await db.findConfig(userDoc.currentConf);
+      if (configDoc === null) {
+        throw new Error('(Database) config doc empty');
+      }
     } catch (error) {
       throw new Error(`(Database) ${error.errmsg}`);
     }
     // If conf not found, use default.conf instead
     if (configDoc === null) {
+      logger.warn('(Database) Conf not found, using default.conf!!');
       try {
         configDoc = await db.findConfig('default.conf');
       } catch (error) {
@@ -89,13 +93,13 @@ const openRTK = async (io, telnet, tcp) => {
   }
 
   // Starts rtklib child process
-  logger.info('Trying to start rtkrcv');
+  logger.info(`Starting RTKRCV : ${configName}`);
   const rtkrcv = spawn(rtkPath, parameters);
 
-  // Delete the temp file
-  if (configName !== 'default.conf') {
-    fs.unlinkSync(configPath);
-  }
+  // // Delete the temp file
+  // if (configName !== 'default.conf') {
+  //   fs.unlinkSync(configPath);
+  // }
   
   if (rtkrcv.pid) {
     rtklib.updateState('pid', rtkrcv.pid);

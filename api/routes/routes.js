@@ -13,12 +13,13 @@ import {
   editConfig,
   getAllConfigs,
   loadConfig,
-  // scanNetworks,
+  scanNetworks,
+  getCurrentNetwork,
+  connectToNetwork,
   getTetherStatus,
   // useTethering,
 } from './handlers';
 
-import { injectConfigPath } from '../middlewares/injections';
 
 // Main
 router.get('/', getWelcome);
@@ -40,9 +41,6 @@ router.put('/status', changeStatus);
  * These api routes are made to interact with rtklib config files
  */
 
-// !Setting rtk as default if the route has an incorrect param or empty
-router.use(injectConfigPath);
-
 // Current configs in use
 router.get('/storage', getCurrentConfig);
 router.put('/storage/name/:name', updateCurrentConfig);
@@ -61,7 +59,10 @@ router.put('/ublox/bin/name/:name', loadConfig);
 
 
 // Wireless & Tethering
-// router.get('/wireless/networks', scanNetworks);
+router.get('/wireless/networks', scanNetworks);
+router.get('/wireless/network', getCurrentNetwork);
+router.post('/wireless/network', connectToNetwork);
+
 
 router.get('/tethering/status', getTetherStatus);
 // router.put('/tethering/status', useTethering);

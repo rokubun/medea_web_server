@@ -10,7 +10,7 @@ import express from 'express';
 import socketIo from 'socket.io';
 import { Server } from 'http';
 
-import { PORT, confNet, paths } from './config';
+import { PORT } from './config';
 
 import {
   listenTelnetEvents,
@@ -26,31 +26,26 @@ import logger from './logger';
 
 // Middlewares and routes
 import configureHeaders from './middlewares/headers'
+import { injectConfigPath } from './middlewares/injections';
 import routes from './routes';
 
-// Declare an express instance
+import databaseConnection from './database/connection';
+import db from './database/helpers';
+
+/*=============================================
+=                Instances                    =
+=============================================*/
+
+// REST API
 const app = express();
 const http = Server(app);
 
-import { settingsToJson } from './utils/files';
-import databaseConnection from './database/connection';
-import db from './database/helpers';
-import { connect } from 'tls';
-
-// Parsing body requests
-app.use(bodyParser.json({ limit: "5MB", type: 'application/json' }));
-app.use(bodyParser.urlencoded({ extended: false }));
-
-// Middlewares before start routes
-app.use(configureHeaders);
-
-// Create the instances
+// App Communication
 const io = socketIo(http);
 const tcp = new net.Socket();
 const telnet = new telnetClient();
 
-
-
+/*=====        End of Instances        ======*/
 /*=============================================
 =            Database Connection              =
 =============================================*/
@@ -93,17 +88,25 @@ const telnet = new telnetClient();
 })();
 
 /*=====  End of Start Services  ======*/
+/*=============================================
+=                Express Routes               =
+=============================================*/
+// Parsing body requests
+app.use(bodyParser.json({ limit: "5MB", type: 'application/json' }));
+app.use(bodyParser.urlencoded({ extended: false }));
 
-
-// Injections
-app.use((req, res, next) => { req.body.telnet = telnet; next(); });
-app.use((req, res, next) => { req.body.tcp = tcp; next(); });
-app.use((req, res, next) => { req.body.io = io; next(); });
+// Middlewares before start routes
+app.use(configureHeaders);
+app.use(injectConfigPath);
+app.use((req, res, next) => { req.custom.telnet = telnet; next(); });
+app.use((req, res, next) => { req.custom.tcp = tcp; next(); });
+app.use((req, res, next) => { req.custom.io = io; next(); });
 
 app.use(routes);
 
-http.listen(PORT);
+/*=====  End of Express Routes  ======*/
 
+http.listen(PORT);
 logger.info(`API started on port ${PORT}`);
 
 export default app;

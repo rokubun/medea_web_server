@@ -4,7 +4,7 @@ import mongoose from 'mongoose';
 
 const SWTOPT = ['off', 'on'];
 const MODOPT = ['single', 'dgps', 'kinematic', 'static', 'static-start', 'movingbase', 'fixed', 'ppp-kine' , 'ppp-static', 'ppp-fixed']
-const FRQOPT = ['l1,2', 'l1+l2,3', 'l1+l2+e5b', 'l1+l2+e5b+l5'];
+const FRQOPT = ['l1', 'l1+l2', 'l1+l2+e5b', 'l1+l2+e5b+l5'];
 const TYPOPT = ['forward', 'backward', 'combined'];
 const IONOPT = ['off', 'brdc', 'sbas', 'dual-freq', 'est-stec', 'ionex-tec', 'qzs-brdc', 'qzs-lex', 'stec'];
 const TRPOPT = ['off', 'saas', 'sbas', 'est-ztd', 'est-ztdgrad', 'ztd'];
@@ -24,7 +24,9 @@ const POSOPT = ['llh', 'xyz', 'single', 'posfile', 'rinexhead', 'rtcm', 'raw'];
 const TIDEOPT = ['off','on', 'otl'];
 const PHWOPT = ['off', 'on', 'precise'];
 
-
+// RTK input and output configs
+const ISTOPT = ['off', 'serial', 'file', 'tcpsvr', 'tcpcli', 'ntripcli', 'ftp', 'http'];
+const FMTOPT = ['rtcm2', 'rtcm3', 'oem4', 'oem3', 'ubx', 'ss2', 'hemis', 'skytraq', 'gw10', 'javad', 'nvs', 'binex', 'rt17', 'sp3'];
 
 const boolean = {
   type: String,
@@ -328,6 +330,16 @@ const params = {
   'file-geexefile': String,
   'file-solstatfile': String,
   'file-tracefile': String,
+  // Input String RTK
+  'inpstr2-type': {
+    type: String,
+    enum: ISTOPT,
+  },
+  'inpstr2-path': String,
+  'inpstr2-format': {
+    type: String,
+    enum: FMTOPT,
+  }
 };
 
 

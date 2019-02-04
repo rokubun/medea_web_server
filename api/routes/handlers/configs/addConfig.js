@@ -16,6 +16,7 @@ import Joi from 'joi';
  * @param {body} file
  */
 const addConfig = (req, res) => {
+  const MAX_CHARS_NAME = 32;
   const ip = resolveClientIp(req);
   const { configsPath, type } = req.custom;
 
@@ -38,13 +39,13 @@ const addConfig = (req, res) => {
   if (type === 'rtk') {
     const config = new ConfigModel;
   
-    config.name = file.name.slice(0, 12);
+    config.name = file.name.slice(0, MAX_CHARS_NAME);
 
     config.options = rtkSettingsToObject(dataParsed);
 
     config.save((error, config) => {
       if (error) {
-        logger.error(`(Database) ${error.errmsg}`);
+        logger.error(`(Database) ${error}`);
         return res.status(409).json({ message: 'There is a profile with the same name', error });
       }
       logger.info(`(Database) new config ${config.name} submitted`);

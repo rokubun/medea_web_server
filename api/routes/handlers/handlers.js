@@ -15,7 +15,9 @@ import getStatus from './status/getStatus';
 import changeStatus from './status/changeStatus';
 
 // Wireless
-//import scanNetworks from './wireless/scanNetworks';
+import scanNetworks from './wireless/scanNetworks';
+import getCurrentNetwork from './wireless/getCurrentNetwork';
+import connectToNetwork from './wireless/connectToNetwork';
 
 // Tethering
 import getTetherStatus from './tethering/getStatus';
@@ -32,7 +34,9 @@ export {
   getStatus,
   changeStatus,
   loadConfig,
-  //scanNetworks,
+  scanNetworks,
+  getCurrentNetwork,
+  connectToNetwork,
   getTetherStatus,
   // useTethering,
 };

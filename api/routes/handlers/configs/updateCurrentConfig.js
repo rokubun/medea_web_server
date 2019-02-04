@@ -50,7 +50,7 @@ const updateCurrentConfig = (req, res) => {
           }
           return res.status(500).json({ message: 'Internal Server Error' });
         }
-        logger.info(`user config updated by ${ip}`);
+        logger.info(`user config updated by ${ip} / ${doc.currentConf}`);
         return res.status(200).json({ message: 'Current config successfully updated' });
       });
     });
