@@ -6,6 +6,20 @@ MEDEA_WEB_SERVER=`dirname $(dirname $(realpath $0))`
 # It will work as long as the last component of the path used to find the script is not a symlink 
 # (directory links are OK)
 
+
+echo 0 > /sys/devices/platform/sd8x-rfkill/pwr_ctrl
+rmmod sd8xxx mlan
+
+modprobe mlan
+modprobe sd8xxx drv_mode=5
+echo 3 > /sys/module/sd8xxx/parameters/drv_mode
+echo 1 > /sys/devices/platform/sd8x-rfkill/pwr_ctrl
+
+ifconfig uap0 10.42.0.1 up
+nmcli connection up hotspot
+
+# Restart wpa to identify interfaces
+systemctl restart wpa_supplicant
 # Setup Wifi as an access point
 # connmanctl tether wifi on MEDEA rocboronat
 
