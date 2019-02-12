@@ -23,6 +23,13 @@ import connectToNetwork from './wireless/connectToNetwork';
 import getTetherStatus from './tethering/getStatus';
 import useTethering from './tethering/useTethering';
 
+// Cellular
+import getCellularConfig from './cellular/getConfig';
+import getCellularStatus from './cellular/getStatus';
+import updateCellularStatus from './cellular/updateStatus';
+import updateCellularConfig from './cellular/updateConfig';
+import getCellularInfo from './cellular/getInfo';
+
 export {
   getWelcome,
   addConfig,
@@ -39,4 +46,9 @@ export {
   connectToNetwork,
   getTetherStatus,
   // useTethering,
+  getCellularConfig,
+  getCellularStatus,
+  updateCellularStatus,
+  updateCellularConfig,
+  getCellularInfo,
 };

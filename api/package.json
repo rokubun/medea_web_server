@@ -30,6 +30,7 @@
     "mongoose": "^4.x.x",
     "node-wifi": "^2.0.5",
     "pretty-bytes": "^5.1.0",
+    "serialport": "^7.1.4",
     "socket.io": "^2.1.1",
     "telnet-client": "^0.15.8",
     "validator": "^10.9.0",

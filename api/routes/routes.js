@@ -18,6 +18,11 @@ import {
   connectToNetwork,
   getTetherStatus,
   // useTethering,
+  getCellularConfig,
+  getCellularStatus,
+  updateCellularStatus,
+  updateCellularConfig,
+  getCellularInfo,
 } from './handlers';
 
 
@@ -66,4 +71,13 @@ router.post('/wireless/network', connectToNetwork);
 
 router.get('/tethering/status', getTetherStatus);
 // router.put('/tethering/status', useTethering);
+
+// Cellular
+router.get('/cellular/config', getCellularConfig);
+router.put('/cellular/config', updateCellularConfig);
+router.get('/cellular/status', getCellularStatus);
+router.put('/cellular/status', updateCellularStatus);
+router.get('/cellular/info', getCellularInfo);
+
+
 export default router;
