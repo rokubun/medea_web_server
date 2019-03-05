@@ -5,14 +5,12 @@ const { execSync } = require('child_process');
 /**
  * GET METHOD
  */
-const getStatus = (req, res) => {
-  const source = 'source /root/medea_web_server/scripts';
+const getStatus = (req, res, next) => {
   try {
-    let status = execSync(`${source}/get_cellular_status.sh`).toString();
+    let status = execSync(`cat /sys/class/gpio/gpio0/value`).toString();
     res.status(200).json({ status: parseInt(status) });
   } catch (err) {
-    logger.error(err);
-    res.status(500);
+    next(err);
   }
 }
 

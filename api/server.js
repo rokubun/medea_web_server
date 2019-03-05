@@ -104,6 +104,16 @@ app.use((req, res, next) => { req.custom.io = io; next(); });
 
 app.use(routes);
 
+app.use((err, req, res, next) => {
+  const { message } = err;
+  if (err.type === 'warning') {
+    logger.warn(message);
+  } else {
+    logger.error(message);
+  }
+  res.status(500).json({ error: message });
+});
+
 /*=====  End of Express Routes  ======*/
 
 http.listen(PORT);

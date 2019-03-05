@@ -1,5 +1,6 @@
 import logger from '../../../logger';
 import wifi from 'node-wifi';
+import { execSync } from 'child_process';
 
 /**
  * GET METHOD
@@ -22,6 +23,7 @@ const scanNetworks = async (req, res) => {
   }
 
   try {
+    execSync('nmcli device wifi rescan');
     let networks = await wifi.scan();
     if (!networks) {
       logger.info('Wifi scan, networks not found');
@@ -36,7 +38,7 @@ const scanNetworks = async (req, res) => {
       res.status(200).json(networks);
     }
   } catch (error) {
-    logger.error(`Error doing the scan ${error}`);
+    logger.error(`Scanning: ${error}`);
     res.status(500);
   }
 }

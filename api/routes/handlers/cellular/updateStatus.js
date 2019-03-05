@@ -1,14 +1,12 @@
 import { execSync } from "child_process";
 import Joi from 'joi';
 
-
-
 /**
  * PUT METHOD
  * It starts or stops the cellular connection
  */
-const updateStatus = (req, res) => {
-  const path = '/root/medea_web_server/scripts/';
+const updateStatus = (req, res, next) => {
+  const path = '/root/medea_web_server/scripts';
   const { newStatus } = req.body;
 
   const schema = Joi.object().keys({
@@ -22,10 +20,16 @@ const updateStatus = (req, res) => {
   }
 
   try {
-    execSync(`${path}${newStatus ? 'start_sara.sh' : 'stop_sara.sh'}`);
-    res.status(200).json({ newStatus });
+    if (newStatus) {
+      execSync(`${path}/start_sara.sh`);
+      const modem_idx = execSync('/root/medea_web_server/scripts/check_modemidx.sh').toString().trim();
+      execSync(`mmcli -i ${modem_idx} --pin=${pin}`);
+    } else {
+      execSync(`${path}/stop_sara.sh`);
+    }
+    res.status(200).json({ changed: true });
   } catch (err) {
-    res.status(500);
+    next(err);
   }
 
 }

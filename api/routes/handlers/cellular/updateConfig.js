@@ -1,42 +1,51 @@
 import Joi from 'joi';
 import { execSync } from 'child_process';
-import logger from '../../../logger';
 
 /**
  * PUT METHOD
  * It updates the cellular config in network manager profile /etc/NetworkManager/system-connections/cellular
  */
-const updateConfig = (req, res) => {
+const updateConfig = (req, res, next) => {
   const schema = Joi.object().keys({
     apn: Joi.string().required(),
     pin: Joi.number().required(),
-    user: Joi.string(),
-    password: Joi.string(),
+    user: Joi.string().allow(''),
+    password: Joi.string().allow(''),
   });
-  
+  console.log(req.body)
   const validation = Joi.validate(req.body, schema);
 
   if (validation.error) {
+    console.log('validation error ', validation.error.details[0]);
     return res.status(400).json({ message: `Bad request ${validation.error.details[0].message}` });
   } 
 
-  let commandStr = 'nmcli con mod cellular';
-
+  
   const keys = Object.keys(req.body);
-  console.log(keys)
   const values = Object.values(req.body);
-  console.log(values)
-
+  
+  const { apn, pin } = req.body;
+  
+  // delete con cellular
   try {
+    execSync('nmcli con del cellular');
+  } catch (err) {
+    console.log('NMCLI DEL', err) 
+  }
+  
+  
+  try {
+    execSync(`nmcli c add type gsm ifname ttyACM0 con-name cellular apn ${apn}`);
+    execSync(`nmcli con mod cellular connection.autoconnect yes`);
     keys.forEach((key, i) => {
-      console.log(`${commandStr} gsm.${key} "${values[i]}"`);
-      execSync(`${commandStr} gsm.${key} "${values[i]}"`);
+      let commandStr = 'nmcli con mod cellular';
+      if (key) {
+        execSync(`${commandStr} gsm.${key} "${values[i]}"`);
+      }
     });
-    console.log('test')
     res.status(200);
   } catch (err) {
-    logger.error(err);
-    res.status(500);
+    next(err);
   }
 }
 
