@@ -6,62 +6,28 @@ MEDEA_WEB_SERVER=`dirname $(dirname $(realpath $0))`
 # It will work as long as the last component of the path used to find the script is not a symlink 
 # (directory links are OK)
 
-
+# Disable WiFi chipset
 echo 0 > /sys/devices/platform/sd8x-rfkill/pwr_ctrl
 rmmod sd8xxx mlan
 
+# Enable WiFi chipset using SPA+AP mode
 modprobe mlan
 modprobe sd8xxx drv_mode=5
 echo 3 > /sys/module/sd8xxx/parameters/drv_mode
 echo 1 > /sys/devices/platform/sd8x-rfkill/pwr_ctrl
 
+# Restart wpa to identify interfaces
+systemctl restart wpa_supplicant
+
+# Enable WiFi Hotspot
 ifconfig uap0 10.42.0.1 up
 nmcli connection up hotspot
 
-# Restart wpa to identify interfaces
-systemctl restart wpa_supplicant
-# Setup Wifi as an access point
-# connmanctl tether wifi on MEDEA rocboronat
-
 # Setup cellular (this might be a redundant step)
-# connmanctl enable cellular
+systemctl start ModemManager
 
 # The corresponding cellular service shall have been configured to autoconnect
 $MEDEA_WEB_SERVER/scripts/start_sara.sh
-# Test connectivity until success or timeout after 60 seconds
-# echo -ne "Monitoring cellular connection..."
-# while true; do
-#   $MEDEA_WEB_SERVER/scripts/test_connection.sh
-#   if [ $? -eq 2 ]; then
-#     $MEDEA_WEB_SERVER/scripts/start_sara.sh
-#     sleep 5
-#   fi
-# done
 
 # Monitor API and Frontend processes and restart them forever
 mkdir -p $MEDEA_WEB_SERVER/api/logs
-# cd $MEDEA_WEB_SERVER/api
-# forever start -c "npm start" loader.js
-
-# # Forever alternative to keep alive API process
-# start_api () {
-#   cd $MEDEA_WEB_SERVER/api
-#   node server.js &
-#   PID_API=$!
-#   echo "New API PID: $PID_API"
-# }
-# 
-# start_api
-# while true; do
-# 
-#   # Restart API process if dead 
-#   if kill -0 "$PID_API" >/dev/null 2>&1 ; then
-#       # echo "PID API: $PID_API running"
-#       :
-#   else
-#       echo "PID API: $PID_API terminated"
-#       start_api
-#   fi
-#   
-#   sleep 3
-# done
