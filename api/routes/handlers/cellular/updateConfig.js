@@ -1,5 +1,6 @@
 import Joi from 'joi';
 import { execSync } from 'child_process';
+import logger from '../../../logger';
 
 /**
  * PUT METHOD
@@ -8,7 +9,7 @@ import { execSync } from 'child_process';
 const updateConfig = (req, res, next) => {
   const schema = Joi.object().keys({
     apn: Joi.string().required(),
-    pin: Joi.number().required(),
+    pin: Joi.number().allow(''),
     user: Joi.string().allow(''),
     password: Joi.string().allow(''),
   });
@@ -24,13 +25,13 @@ const updateConfig = (req, res, next) => {
   const keys = Object.keys(req.body);
   const values = Object.values(req.body);
   
-  const { apn, pin } = req.body;
+  const { apn } = req.body;
   
   // delete con cellular
   try {
     execSync('nmcli con del cellular');
   } catch (err) {
-    console.log('NMCLI DEL', err) 
+    logger.error('deleting NM cellular profile');
   }
   
   
