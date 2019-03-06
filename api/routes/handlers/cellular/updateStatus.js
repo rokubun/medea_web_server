@@ -22,8 +22,6 @@ const updateStatus = (req, res, next) => {
   try {
     if (newStatus) {
       execSync(`${path}/start_sara.sh`);
-      const modem_idx = execSync('/root/medea_web_server/scripts/check_modemidx.sh').toString().trim();
-      execSync(`mmcli -i ${modem_idx} --pin=${pin}`);
     } else {
       execSync(`${path}/stop_sara.sh`);
     }
